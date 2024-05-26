@@ -2,7 +2,7 @@ import axios from "redaxios";
 import http from "../services/httpService";
 import { envRoute } from "../utils";
 
-interface signInPayload {
+type credentials {
   username: string;
   password: string;
 }
