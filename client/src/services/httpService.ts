@@ -1,7 +1,8 @@
 import axios from "axios";
+import { envRoute } from "../utils";
 
 const axiosInstance = axios.create({
-  baseURL: `${process.env.REACT_APP_API_URL}/api`,
+  baseURL: `${envRoute}/v1`,
   withCredentials: true,
 });
 

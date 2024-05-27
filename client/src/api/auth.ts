@@ -1,25 +1,23 @@
-import axios from "redaxios";
 import http from "../services/httpService";
-import { envRoute } from "../utils";
 
-type credentials {
+export type Credential = {
   username: string;
   password: string;
-}
+};
 
-type signUpPayload {
-  cityMunicipality: string;
+export type User = {
   companyName: string;
-  email: string;
   username: string;
+  email: string;
   password: string;
   confirmPassword: string;
   organizationType: string;
   province: string;
-}
+  cityMunicipality: string;
+};
 
-export const signInUser = async (payload: credentials) =>
-  await http.post(`${envRoute}/v1/sign-in`, payload);
+export const signInUser = async (credential: Credential): Promise<void> =>
+  await http.post("/sign-in", credential);
 
-export const signUpUser = async (payload: credentials) =>
-  await axios.post(`${envRoute}/v1/sign-up`, payload);
+export const signUpUser = async (user: User): Promise<void> =>
+  await http.post("/sign-up", user);
