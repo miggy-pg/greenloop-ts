@@ -16,8 +16,10 @@ export type User = {
   cityMunicipality: string;
 };
 
-export const signInUser = async (credential: Credential): Promise<void> =>
+export const login = async (credential: Credential) =>
   await http.post("/sign-in", credential);
 
-export const signUpUser = async (user: User): Promise<void> =>
-  await http.post("/sign-up", user);
+export const register = async (user: User) => await http.post("/sign-up", user);
+
+export const signout = async (companyId: string) =>
+  http.patch(`/sign-out/${companyId}`);
