@@ -4,7 +4,7 @@ interface BodyProps {
   pageId: string;
 }
 
-const Body = ({ children, bodyClass, pageId }: BodyProps) => {
+function Body({ children, bodyClass, pageId }: BodyProps) {
   return (
     <div
       className={`w-full h-full overflow-hidden ${bodyClass}`}
@@ -13,6 +13,6 @@ const Body = ({ children, bodyClass, pageId }: BodyProps) => {
       {children}
     </div>
   );
-};
+}
 
 export default Body;
