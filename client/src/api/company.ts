@@ -1,4 +1,3 @@
-import { AxiosResponse } from "axios";
 import http from "../services/httpService";
 import { User } from "./auth";
 
