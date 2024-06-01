@@ -1,21 +1,18 @@
 import http from "../services/httpService";
+import { WasteProps } from "../types/waste.types";
 
-type Waste = {
-  description: string;
-  category: string;
-  image: string;
-  user: string;
-};
+export const getWastes = async () => await http.get(`/wastes`);
 
-export const getWastes = async () => http.get(`/wastes`);
+export const createWaste = async (waste: WasteProps) =>
+  await http.post("/wastes", waste);
 
-export const createWaste = async (waste: Waste) => http.post("/wastes", waste);
+export const updateWaste = async (wasteId: string, waste: WasteProps) =>
+  await http.put(`/wastes/${wasteId}`, waste);
 
-export const updateWaste = async (wasteId: string, waste: Waste) =>
-  http.put(`/wastes/${wasteId}`, waste);
-
-export const updateWasteAvailability = async (wasteId: string, waste: Waste) =>
-  http.put(`/wastes/${wasteId}/availability`, waste);
+export const updateWasteAvailability = async (
+  wasteId: string,
+  waste: WasteProps
+) => await http.put(`/wastes/${wasteId}/availability`, waste);
 
 export const deleteWaste = async (wasteId: string) =>
-  http.delete(`/wastes/${wasteId}`);
+  await http.delete(`/wastes/${wasteId}`);
