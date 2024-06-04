@@ -1,6 +1,10 @@
 import wasteCategories from "../../../constants/wasteCategories";
 
-function FilterCard({ handleOnChangeFilter }) {
+function FilterCard({
+  handleOnChangeFilter,
+}: {
+  handleOnChangeFilter: (event: React.MouseEvent<HTMLDivElement>) => void;
+}) {
   return (
     <div
       className={`z-50 max-w-sm absolute border border-violet-800"

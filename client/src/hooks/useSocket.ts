@@ -1,30 +1,49 @@
 import io from "socket.io-client";
+import { Socket } from "socket.io-client";
 import { useEffect, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { updateHasReadMessage } from "../api/message";
-import { socketPort } from "../utils/Helper";
+import { socketPort } from "../utils/socket";
 import { UserProps } from "../types/user.types";
 
-export const useSocketMessages = (user) => {
+interface Message {
+  id: string;
+  msg: string;
+  msgImage: { url: string };
+}
+
+interface NewMessage {
+  company: {
+    companyName: string;
+    email: string;
+    id: string;
+    image: { public_id: string; url: string };
+  };
+  conversationId: string;
+  hasRead: boolean;
+  message: Message;
+}
+
+export const useSocketMessages = (user: UserProps) => {
   const queryClient = useQueryClient();
 
-  const [socket, setSocket] = useState(null);
+  const [socket, setSocket] = useState<Socket | null>(null);
   const [newMessages, setNewMessages] = useState([]);
   const [onClickedRead, setOnClickedRead] = useState(false);
 
   const { mutate: readMessage } = useMutation({
-    mutationFn: (messageId) => updateHasReadMessage(messageId),
+    mutationFn: (messageId: string) => updateHasReadMessage(messageId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["conversations"] });
     },
   });
 
-  const hasReadMessage = (messageId, all = false) => {
+  const hasReadMessage = (messageId: string, all = false) => {
     if (messageId) readMessage(messageId);
 
     if (all) {
-      newMessages?.forEach((message) => {
+      newMessages?.forEach((message: NewMessage) => {
         readMessage(message?.message?.id);
       });
     }
