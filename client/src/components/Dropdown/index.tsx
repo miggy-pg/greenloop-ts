@@ -36,7 +36,7 @@ const Dropdown = (props: Dropdown) => {
   const { icon: Icon, children, classNames, isDisabled } = props;
   const wrapperRef = React.useRef<HTMLDivElement>(null);
   const [openWrapper, setOpenWrapper] = React.useState(false);
-  useOutsideAlerter(wrapperRef, setOpenWrapper);
+  // useOutsideAlerter(wrapperRef, setOpenWrapper);
 
   return (
     <div ref={wrapperRef} className="relative flex">
