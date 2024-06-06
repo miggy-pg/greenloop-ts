@@ -1,15 +1,17 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-import defaultImage from "../../../../assets/images/waste-default-image.webp";
+import Dropdown from "../../Dropdown";
+import { updateWasteAvailability } from "../../../api/waste";
+import { plasticColor } from "../../../utils/plasticColor";
+import { formatDateTime } from "../../../utils/formatDateTime";
 import { IoMdTime } from "react-icons/io";
-import { transformText } from "../../../../utils/plasticColors";
-import formatDateTime from "../../../../utils/formatDateTime";
 import { HiOutlineDotsHorizontal } from "react-icons/hi";
 
-import { updateWasteAvailableOrNot } from "../../../../api/waste";
-import Dropdown from "../../Dropdown";
+import defaultImage from "../../../../assets/images/waste-default-image.webp";
+
+interface ListingCardProps {}
 
 const ListingCard = ({ waste, loggedInUser }) => {
   const url = window.location.href;
@@ -25,14 +27,14 @@ const ListingCard = ({ waste, loggedInUser }) => {
     available,
   } = waste;
 
-  const transformedTexts = transformText(wasteCategory);
+  const transformedTexts = plasticColor(wasteCategory);
   const queryClient = useQueryClient();
 
   const { handleSubmit } = useForm();
 
   const { mutate: updateWasteAvailability } = useMutation({
     mutationFn: (payload) => {
-      updateWasteAvailableOrNot(payload.id, {
+      updateWasteAvailability(payload.id, {
         available: payload.available,
       });
     },
@@ -89,7 +91,7 @@ const ListingCard = ({ waste, loggedInUser }) => {
             </p>
             <Dropdown
               classNames={"py-2 bottom-[-90px] -left-[130px] w-max"}
-              button={
+              icon={
                 <HiOutlineDotsHorizontal className="text-gray-400 cursor-pointer" />
               }
               isDisabled={loggedInUser?.id !== user?._id}

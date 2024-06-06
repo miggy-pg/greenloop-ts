@@ -1,18 +1,17 @@
 import React from "react";
 import { IconType } from "react-icons/lib";
 
-interface OutsideAlerter {
-  ref: React.MutableRefObject<null>;
-  setX: React.Dispatch<React.SetStateAction<boolean>>;
+interface RefProp {
+  current: HTMLDivElement | null;
 }
 
-function useOutsideAlerter(ref: HTMLDivElement, setX: boolean) {
+function useOutsideAlerter(ref: RefProp, setX: (open: boolean) => void) {
   React.useEffect(() => {
     /**
      * Alert if clicked on outside of element
      */
-    function handleClickOutside(event: React.MouseEvent) {
-      if (ref.current && !ref.current.contains(event.target)) {
+    function handleClickOutside(event: MouseEvent): void {
+      if (!ref?.current?.contains(event.target as Node)) {
         setX(false);
       }
     }
@@ -27,23 +26,21 @@ function useOutsideAlerter(ref: HTMLDivElement, setX: boolean) {
 
 interface Dropdown {
   classNames: string;
-  icon: IconType;
+  icon: JSX.Element;
   isDisabled: boolean;
   children: React.ReactNode;
 }
 
 const Dropdown = (props: Dropdown) => {
   const { icon: Icon, children, classNames, isDisabled } = props;
-  const wrapperRef = React.useRef<HTMLDivElement>(null);
+  const wrapperRef = React.useRef<HTMLDivElement | null>(null);
   const [openWrapper, setOpenWrapper] = React.useState(false);
-  // useOutsideAlerter(wrapperRef, setOpenWrapper);
+  useOutsideAlerter(wrapperRef, setOpenWrapper);
 
   return (
     <div ref={wrapperRef} className="relative flex">
       <div className="flex" onMouseDown={() => setOpenWrapper(!openWrapper)}>
-        <button disabled={isDisabled ? true : false}>
-          <Icon />
-        </button>
+        <button disabled={isDisabled ? true : false}>{Icon}</button>
       </div>
       <div
         className={`${classNames} absolute z-10 "origin-top-right transition-all duration-300 ease-in-out ${
