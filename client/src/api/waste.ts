@@ -1,6 +1,10 @@
 import http from "../services/httpService";
 import { WasteProps } from "../types/waste.types";
 
+type IsAvailable = {
+  available: boolean;
+};
+
 export const getWastes = async () => await http.get(`/wastes`);
 
 export const createWaste = async (waste: WasteProps) =>
@@ -11,8 +15,8 @@ export const updateWaste = async (wasteId: string, waste: WasteProps) =>
 
 export const updateWasteAvailability = async (
   wasteId: string,
-  waste: WasteProps
-) => await http.put(`/wastes/${wasteId}/availability`, waste);
+  isAvailable: IsAvailable
+) => await http.put(`/wastes/${wasteId}/availability`, isAvailable);
 
 export const deleteWaste = async (wasteId: string) =>
   await http.delete(`/wastes/${wasteId}`);

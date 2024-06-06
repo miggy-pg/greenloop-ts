@@ -3,6 +3,7 @@ export type WasteProps = {
   category: string;
   image: string;
   user: string;
+  available?: boolean;
 };
 
 export interface Waste {}

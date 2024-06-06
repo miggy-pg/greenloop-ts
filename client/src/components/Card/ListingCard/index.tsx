@@ -8,12 +8,35 @@ import { plasticColor } from "../../../utils/plasticColor";
 import { formatDateTime } from "../../../utils/formatDateTime";
 import { IoMdTime } from "react-icons/io";
 import { HiOutlineDotsHorizontal } from "react-icons/hi";
+import { UserProps } from "../../../types/user.types";
 
 import defaultImage from "../../../../assets/images/waste-default-image.webp";
 
-interface ListingCardProps {}
+interface ListingCardProps {
+  available: boolean;
+  createdAt: Date;
+  companyId: string;
+  id: string;
+  post: string;
+  wasteCategory: string;
+  image: {
+    public_id: string;
+    url: string;
+  };
+}
 
-const ListingCard = ({ waste, loggedInUser }) => {
+interface Payload {
+  wasteId: string;
+  available: boolean;
+}
+
+const ListingCard = ({
+  waste,
+  loggedInUser,
+}: {
+  waste: ListingCardProps;
+  loggedInUser: UserProps;
+}) => {
   const url = window.location.href;
   const isProfile = url.split("/").includes("profile");
 
@@ -21,7 +44,7 @@ const ListingCard = ({ waste, loggedInUser }) => {
     id: wasteId,
     image,
     post,
-    user,
+    companyId,
     wasteCategory,
     createdAt,
     available,
@@ -32,28 +55,28 @@ const ListingCard = ({ waste, loggedInUser }) => {
 
   const { handleSubmit } = useForm();
 
-  const { mutate: updateWasteAvailability } = useMutation({
-    mutationFn: (payload) => {
-      updateWasteAvailability(payload.id, {
-        available: payload.available,
+  const { mutate: updateWasteAvailable } = useMutation({
+    mutationFn: ({ wasteId, available }: Payload) => {
+      return updateWasteAvailability(wasteId, {
+        available: available,
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries("companyWastes");
+      queryClient.invalidateQueries({ queryKey: ["companyWastes"] });
       console.log("onSuccess");
     },
   });
 
   const onSubmit = () => {
-    updateWasteAvailability({
-      id: wasteId,
+    updateWasteAvailable({
+      wasteId,
       available: !available,
     });
   };
 
   return !isProfile ? (
     <div className="bg-white border border-gray-200 shadow-sm rounded-3xl my-2 md:my-4">
-      <Link to={`/profile/${user?._id}`}>
+      <Link to={`/profile/${companyId}`}>
         <div className="h-80 flex items-center justify-between lg:justify-evenly sm:h-40 2xsm:h-28">
           <div className="w-screen border rounded-t-3xl">
             <img
@@ -94,7 +117,7 @@ const ListingCard = ({ waste, loggedInUser }) => {
               icon={
                 <HiOutlineDotsHorizontal className="text-gray-400 cursor-pointer" />
               }
-              isDisabled={loggedInUser?.id !== user?._id}
+              isDisabled={loggedInUser?.id !== companyId}
             >
               <div className="flex h-max w-40 flex-col justify-start rounded-[20px] bg-zinc-50 bg-no-repeat pb-3 shadow-md">
                 <div className="mt-3 ml-4">
