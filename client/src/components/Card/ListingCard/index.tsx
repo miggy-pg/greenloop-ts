@@ -11,11 +11,12 @@ import { HiOutlineDotsHorizontal } from "react-icons/hi";
 import { UserProps } from "../../../types/user.types";
 
 import defaultImage from "../../../../assets/images/waste-default-image.webp";
+import { Payload } from "../../../types/waste.types";
 
 interface ListingCardProps {
   available: boolean;
   createdAt: Date;
-  companyId: string;
+  user: { _id: string };
   id: string;
   post: string;
   wasteCategory: string;
@@ -23,11 +24,6 @@ interface ListingCardProps {
     public_id: string;
     url: string;
   };
-}
-
-interface Payload {
-  wasteId: string;
-  available: boolean;
 }
 
 const ListingCard = ({
@@ -44,7 +40,7 @@ const ListingCard = ({
     id: wasteId,
     image,
     post,
-    companyId,
+    user: { _id: userId },
     wasteCategory,
     createdAt,
     available,
@@ -55,20 +51,20 @@ const ListingCard = ({
 
   const { handleSubmit } = useForm();
 
-  const { mutate: updateWasteAvailable } = useMutation({
+  const { mutate: handleUpdateWasteAvailability } = useMutation({
     mutationFn: ({ wasteId, available }: Payload) => {
       return updateWasteAvailability(wasteId, {
         available: available,
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["companyWastes"] });
+      queryClient.invalidateQueries({ queryKey: ["userWastes"] });
       console.log("onSuccess");
     },
   });
 
   const onSubmit = () => {
-    updateWasteAvailable({
+    handleUpdateWasteAvailability({
       wasteId,
       available: !available,
     });
@@ -76,7 +72,7 @@ const ListingCard = ({
 
   return !isProfile ? (
     <div className="bg-white border border-gray-200 shadow-sm rounded-3xl my-2 md:my-4">
-      <Link to={`/profile/${companyId}`}>
+      <Link to={`/profile/${userId}`}>
         <div className="h-80 flex items-center justify-between lg:justify-evenly sm:h-40 2xsm:h-28">
           <div className="w-screen border rounded-t-3xl">
             <img
@@ -117,7 +113,7 @@ const ListingCard = ({
               icon={
                 <HiOutlineDotsHorizontal className="text-gray-400 cursor-pointer" />
               }
-              isDisabled={loggedInUser?.id !== companyId}
+              isDisabled={loggedInUser?.id !== userId}
             >
               <div className="flex h-max w-40 flex-col justify-start rounded-[20px] bg-zinc-50 bg-no-repeat pb-3 shadow-md">
                 <div className="mt-3 ml-4">

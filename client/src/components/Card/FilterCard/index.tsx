@@ -3,7 +3,9 @@ import wasteCategories from "../../../constants/wasteCategories";
 function FilterCard({
   handleOnChangeFilter,
 }: {
-  handleOnChangeFilter: (event: React.MouseEvent<HTMLDivElement>) => void;
+  handleOnChangeFilter: (
+    event: React.MouseEvent<HTMLDivElement, MouseEvent>
+  ) => void;
 }) {
   return (
     <div

@@ -1,12 +1,11 @@
-import React from "react";
-import { IconType } from "react-icons/lib";
+import { useEffect, useState, useRef } from "react";
 
 interface RefProp {
   current: HTMLDivElement | null;
 }
 
 function useOutsideAlerter(ref: RefProp, setX: (open: boolean) => void) {
-  React.useEffect(() => {
+  useEffect(() => {
     /**
      * Alert if clicked on outside of element
      */
@@ -33,8 +32,8 @@ interface Dropdown {
 
 const Dropdown = (props: Dropdown) => {
   const { icon: Icon, children, classNames, isDisabled } = props;
-  const wrapperRef = React.useRef<HTMLDivElement | null>(null);
-  const [openWrapper, setOpenWrapper] = React.useState(false);
+  const wrapperRef = useRef<HTMLDivElement | null>(null);
+  const [openWrapper, setOpenWrapper] = useState(false);
   useOutsideAlerter(wrapperRef, setOpenWrapper);
 
   return (
