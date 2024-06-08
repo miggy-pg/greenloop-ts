@@ -1,18 +1,18 @@
 import { useNavigate } from "react-router-dom";
-import { signOutCompany } from "../../../../api/company";
+import { logout } from "../../../api/auth";
 
-const Logout = ({
+function Logout({
   setIsLoggingOut,
 }: {
   setIsLoggingOut: (logout: boolean) => void;
-}) => {
-  const user = JSON.parse(localStorage.getItem("user:detail"));
+}) {
+  const user = JSON.parse(localStorage.getItem("user:detail") || "{}");
   const navigate = useNavigate();
 
-  const signOut = async () => {
+  const handleSignOut = async () => {
     navigate("/users/sign-in");
     localStorage.clear();
-    await signOutCompany(user.id);
+    await logout(user?.id);
   };
   return (
     <>
@@ -33,7 +33,7 @@ const Logout = ({
               <button
                 className="bg-[#31572C] text-white active:bg-[#2e4d29] font-bold uppercase text-sm px-6 py-3 rounded-full shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150 md:text-clamp-button md:px-3 md:py-1"
                 type="button"
-                onClick={() => signOut()}
+                onClick={() => handleSignOut()}
               >
                 Yes
               </button>
@@ -44,6 +44,6 @@ const Logout = ({
       <div className="opacity-25 fixed inset-0 z-40 bg-black" />
     </>
   );
-};
+}
 
 export default Logout;

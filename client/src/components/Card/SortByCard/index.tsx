@@ -1,10 +1,10 @@
 const sortByFields = ["Latest to Oldest", "Oldest to Latest"];
 
-const SortByCard = ({
+function SortByCard({
   handleSortBy,
 }: {
   handleSortBy: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
-}) => {
+}) {
   return (
     <div
       className={`z-50 max-w-sm absolute border border-violet-800"
@@ -29,6 +29,6 @@ const SortByCard = ({
       </div>
     </div>
   );
-};
+}
 
 export default SortByCard;

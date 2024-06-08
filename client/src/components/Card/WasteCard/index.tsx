@@ -78,7 +78,7 @@ const WasteCard = ({
             <img
               className="w-11 h-11 mr-5 rounded-full cursor-pointer hover:opacity-80 xsm:w-9 xsm:h-9 xsm:mr-3"
               src={user?.image ? image?.url : defaultImage}
-              alt={user?.companyName}
+              alt={user?.fullName}
             />
           </Link>
           <div className="w-full text-left">
@@ -87,7 +87,7 @@ const WasteCard = ({
                 className="hover:underline cursor-pointer xsm:text-xxs"
                 to={`profile/${user?._id}`}
               >
-                {user?.companyName ? user.companyName : "User"}
+                {user?.fullName ? user.fullName : "User"}
               </Link>
               <span className="flex reverse">
                 <p

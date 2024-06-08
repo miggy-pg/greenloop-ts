@@ -9,7 +9,7 @@ const GreetingCard = ({ user }: { user: UserProps }) => {
             Welcome back,
           </p>
           <p className="text-4xl/8 font-bold text-white sm:text-2xl/4 xsm:text-xl ">
-            {user?.companyName}
+            {user?.fullName}
           </p>
         </span>
       </span>

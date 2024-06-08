@@ -15,7 +15,7 @@ interface Message {
 
 interface NewMessage {
   company: {
-    companyName: string;
+    fullName: string;
     email: string;
     id: string;
     image: { public_id: string; url: string };
@@ -25,7 +25,7 @@ interface NewMessage {
   message: Message;
 }
 
-export const useSocketMessages = (user: UserProps) => {
+const useSocketMessage = (user: UserProps) => {
   const queryClient = useQueryClient();
 
   const [socket, setSocket] = useState<Socket | null>(null);
@@ -65,3 +65,5 @@ export const useSocketMessages = (user: UserProps) => {
 
   return { newMessages, hasReadMessage };
 };
+
+export { useSocketMessage };

@@ -13,7 +13,7 @@ interface Input {
   onChange: () => void;
 }
 
-const Input = ({
+function Input({
   label = "",
   name = "",
   type = "text",
@@ -24,7 +24,7 @@ const Input = ({
   register,
   value = "",
   onChange = () => {},
-}: Input) => {
+}: Input) {
   return (
     <div className={`${className}`}>
       <label
@@ -56,6 +56,6 @@ const Input = ({
       )}
     </div>
   );
-};
+}
 
 export default Input;

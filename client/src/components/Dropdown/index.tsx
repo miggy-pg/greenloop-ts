@@ -30,7 +30,7 @@ interface Dropdown {
   children: React.ReactNode;
 }
 
-const Dropdown = (props: Dropdown) => {
+function Dropdown(props: Dropdown) {
   const { icon: Icon, children, classNames, isDisabled } = props;
   const wrapperRef = useRef<HTMLDivElement | null>(null);
   const [openWrapper, setOpenWrapper] = useState(false);
@@ -50,6 +50,6 @@ const Dropdown = (props: Dropdown) => {
       </div>
     </div>
   );
-};
+}
 
 export default Dropdown;

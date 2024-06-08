@@ -18,7 +18,7 @@ const dashboardRoutes = [
   },
 ];
 
-const DashboardLayout = () => {
+function DashboardLayout() {
   return (
     <aside
       id="sidebar"
@@ -45,6 +45,6 @@ const DashboardLayout = () => {
       </div>
     </aside>
   );
-};
+}
 
 export default DashboardLayout;

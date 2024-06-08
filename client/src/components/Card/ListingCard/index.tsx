@@ -26,13 +26,13 @@ interface ListingCardProps {
   };
 }
 
-const ListingCard = ({
+function ListingCard({
   waste,
   loggedInUser,
 }: {
   waste: ListingCardProps;
   loggedInUser: UserProps;
-}) => {
+}) {
   const url = window.location.href;
   const isProfile = url.split("/").includes("profile");
 
@@ -163,6 +163,6 @@ const ListingCard = ({
       </article>
     </div>
   );
-};
+}
 
 export default ListingCard;

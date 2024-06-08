@@ -3,13 +3,13 @@ import { getUser, getUsers } from "../api/user";
 
 export const useGetUser = (companyId: string) => {
   const {
-    data: companyData = [],
+    data = [],
     isLoading,
     error,
   } = useQuery({
-    queryKey: ["company"],
+    queryKey: ["user"],
     queryFn: () => getUser(companyId),
   });
 
-  return { companyData, isLoading, error };
+  return { data, isLoading, error };
 };

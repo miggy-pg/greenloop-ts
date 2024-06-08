@@ -1,21 +1,24 @@
+import { UserWaste } from "./waste.types";
+
 export type UserProps = {
-  id?: string;
-  _id?: string;
-  companyName: string;
+  fullName: string;
   username: string;
   email: string;
-  organizationType: string;
+  organization: string;
   province: string;
-  cityMunicipality: string;
+  city: string;
   password: string;
   confirmPassword?: string;
+  id?: string;
+  _id?: string;
   image?: string;
   isAdmin?: boolean;
   token?: string;
+  wastes?: UserWaste[];
 };
 
 export interface User {
-  data?: UserProps;
+  data?: UserProps[];
   isLoading: boolean;
   error: string;
 }
