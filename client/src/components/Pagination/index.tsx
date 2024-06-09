@@ -12,6 +12,26 @@ interface Pagination {
   setSearchParams: SetURLSearchParams;
 }
 
+interface IconButton {
+  onClick: () => void;
+  disabled: boolean;
+  children: React.ReactNode;
+}
+
+function IconButton({ onClick, disabled, children }: IconButton) {
+  return (
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      className={`hover:bg-primary-800 focus:ring-primary-300 h-12 w-12 cursor-pointer items-center justify-center text-center text-lg font-normal text-[#698c4e] ${
+        disabled && "cursor-no-drop"
+      }`}
+    >
+      {children}
+    </button>
+  );
+}
+
 function Pagination({
   origWaste,
   paginatePage,
@@ -47,13 +67,9 @@ function Pagination({
 
   return (
     <nav className="flex row-span-1">
-      <TbCaretLeftFilled
-        onClick={prevPage}
-        disabled={currentPage === 1}
-        className={`hover:bg-primary-800 focus:ring-primary-300 h-12 w-12 cursor-pointer items-center justify-center text-center text-lg font-normal text-[#698c4e] ${
-          currentPage === 1 && "cursor-no-drop"
-        }`}
-      />
+      <IconButton onClick={prevPage} disabled={currentPage == 1}>
+        <TbCaretLeftFilled />
+      </IconButton>
       <ul className="pagination flex justify-center items-center">
         {pageNumbers.map((number) => (
           <li key={number} className="page-item cursor-pointer">
@@ -66,13 +82,9 @@ function Pagination({
           </li>
         ))}
       </ul>
-      <TbCaretRightFilled
-        onClick={nextPage}
-        disabled={currentPage === pageCount}
-        className={`hover:bg-primary-800 focus:ring-primary-300 h-12 w-12 cursor-pointer items-center justify-center text-center text-lg font-normal text-[#698c4e] ${
-          currentPage === pageCount && "cursor-no-drop"
-        }`}
-      />
+      <IconButton onClick={nextPage} disabled={currentPage === pageCount}>
+        <TbCaretRightFilled />
+      </IconButton>
     </nav>
   );
 }
