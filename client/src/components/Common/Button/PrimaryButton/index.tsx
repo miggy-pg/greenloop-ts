@@ -2,7 +2,7 @@ interface ButtonProps {
   label: string;
   type?: "submit" | "reset" | "button" | undefined;
   className: string;
-  disabled: boolean;
+  disabled?: boolean;
 }
 
 function PrimaryButton({

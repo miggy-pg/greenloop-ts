@@ -14,12 +14,12 @@ import {
 } from "react-icons/io5";
 
 import Notification from "../../../modules/Notification/Desktop";
-import SettingsDropdown from "../SettingsDropdown";
+import SettingsDropdown from "../../Common/SettingsDropdown";
 import Logout from "../Modal/Logout";
-import { useSocketMessage } from "../../hooks/useSocket";
+import { useSocketMessage } from "../../../hooks/useSocket";
 
 import greenloopLogo from "../../../assets/images/greenloop-logo.png";
-import { useGetUser } from "../../hooks/useUser";
+import { useGetUser } from "../../../hooks/useUser";
 
 const iconSizes = "h-4.5 w-4.5 lg:h-5 lg:w-5 md:h-5 md:w-5";
 
