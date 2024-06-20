@@ -1,39 +1,51 @@
-import { useNavigate } from "react-router-dom";
+import { SubmitHandler, useForm } from "react-hook-form";
 import { useMutation } from "@tanstack/react-query";
-import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 
 import Button from "../../../components/Common/Button/PrimaryButton";
-import Input from "../../components/Common/Input";
-import { signInUser } from "../../api/auth";
+import Input from "../../../components/Common/Input";
+
+import { login } from "../../../api/auth";
+import { UserProps } from "../../../types/user.types";
+
 import forrestImage from "../../assets/images/login-side-panel.webp";
 import greenLoopLogo from "../../assets/images/greenloop-logo.png";
+
+interface Error {
+  response: { data: string };
+}
 
 function Login() {
   document.title = "Green Loop | Sign In";
 
-  const { register, handleSubmit, reset } = useForm();
+  const { register, handleSubmit, reset } = useForm<UserProps>();
 
   const navigate = useNavigate();
 
-  const { mutateAsync: handleSubmit } = useMutation({
-    mutationFn: (data) => signInUser(data),
+  const { mutateAsync: handleSubmitUser } = useMutation({
+    mutationFn: (data: UserProps) => login(data),
     onSuccess: (res) => {
-      localStorage.setItem("user:token", res?.data?.token);
-      localStorage.setItem("user:detail", JSON.stringify(res.data.user));
+      if (res) {
+        localStorage.setItem("user:token", res.data?.token);
+        localStorage.setItem("user:detail", JSON.stringify(res.data.user));
+      }
       navigate("/");
       reset();
     },
-    onError: (error) => {
-      alert(error.response?.data || error?.data);
+    onError: (error: Error) => {
+      alert(error?.response?.data);
       console.log("error: ", error);
       reset();
     },
   });
 
-  const onSubmit = (data, e) => {
-    e.preventDefault();
-    handleSubmit(data);
+  const onSubmit: SubmitHandler<UserProps> = (data, ev) => {
+    ev?.preventDefault();
+    handleSubmitUser(data);
   };
+
+  const password = register("password");
+  const username = register("username");
 
   return (
     <div className="flex h-dvh w-dvw">
@@ -65,20 +77,18 @@ function Login() {
             onSubmit={handleSubmit(onSubmit)}
           >
             <Input
-              id="username"
-              type="text"
               name="username"
+              type="text"
               placeholder="username"
               className="mb-6"
-              register={{ ...register("username") }}
+              inputRef={username}
             />
             <Input
-              id="password"
-              type="password"
               name="password"
+              type="password"
               placeholder="password"
               className="mb-1"
-              register={{ ...register("password") }}
+              inputRef={password}
             />
             <span className="text-right mb-7">
               <span

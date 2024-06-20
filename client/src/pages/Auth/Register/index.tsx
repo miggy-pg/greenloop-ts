@@ -1,19 +1,24 @@
-import { useForm } from "react-hook-form";
+import { SubmitHandler, useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 
-import Button from "../../components/Common/Button";
-import Input from "../../components/Common/Input";
+import Button from "../../../components/Common/Button/PrimaryButton";
+import Input from "../../../components/Common/Input";
 import leavesImage from "../../assets/images/signup-side-panel.webp";
-import { signUpUser } from "../../api/auth";
-import mindanaoPlaces from "../../constants/mindanaoPlaces";
+import { register as registerUser } from "../../../api/auth";
+import provinceAndMunicipality from "../../../constants/provinceAndMunicipality";
+import organizations from "../../../constants/organizations";
 import { useState } from "react";
+import { UserProps } from "../../../types/user.types";
 
 const organizationType = [
   { value: "Waste Generator", label: "Waste Generator" },
   { value: "Recycling Startup", label: "Recycling Startup" },
   { value: "Informal Waste Sector", label: "Informal Waste Sector" },
 ];
+interface Error {
+  data: string;
+}
 
 function Register() {
   document.title = "Green Loop | Sign Up";
@@ -23,13 +28,13 @@ function Register() {
   });
   const [places, setPlaces] = useState([]);
 
-  const { mutate: createUser } = useMutation({
-    mutationFn: (data) => signUpUser(data),
+  const { mutate: handleRegisterUser } = useMutation({
+    mutationFn: (data: UserProps) => registerUser(data),
     onSuccess: () => {
       alert("Company created successfully");
       navigate("/users/sign-in");
     },
-    onError: (error) => {
+    onError: (error: Error) => {
       alert(error?.data);
       console.log("error: ", error);
     },
@@ -37,20 +42,20 @@ function Register() {
 
   const navigate = useNavigate();
 
-  const onSubmit = (data, e) => {
-    e.preventDefault();
-    createUser(data);
+  const onSubmit: SubmitHandler<UserProps> = (data, ev) => {
+    ev?.preventDefault();
+    handleRegisterUser(data);
   };
 
-  const handleOnChangeProvince = (e) => {
-    if (e.target.id == "provinces" && e.target.value == "Select a Province") {
+  const handleOnChangeProvince = (ev: React.FormEvent<HTMLFormElement>) => {
+    const inputEl = ev.target as HTMLInputElement;
+    if (inputEl.id == "provinces" && inputEl.value == "Select a Province") {
       setPlaces([]);
     } else {
-      const filteredMunicipalities = mindanaoPlaces.filter((province) =>
-        province.name.includes(e.target.value)
+      const filteredMunicipalities = provinceAndMunicipality.filter(
+        (province) => province.name.includes(inputEl.value)
       );
-      console.log("filteredMunicipalities: ", filteredMunicipalities);
-      setPlaces(filteredMunicipalities[0].places);
+      if (filteredMunicipalities) setPlaces(filteredMunicipalities[0].places);
 
       document.getElementById("municipalities").value =
         filteredMunicipalities[0].places[0];
@@ -125,7 +130,7 @@ function Register() {
                 required: "Please select organization type",
               })}
             >
-              {organizationType.map((item, index) => (
+              {organizations.map((item, index) => (
                 <option id={index} key={index} value={item.value}>
                   {item.label}
                 </option>

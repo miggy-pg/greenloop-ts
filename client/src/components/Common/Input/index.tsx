@@ -1,16 +1,17 @@
-import { FieldValues, UseFormRegister } from "react-hook-form";
+import { UseFormRegisterReturn } from "react-hook-form";
 
 interface Input {
-  label: string | undefined;
-  name: string | undefined;
+  label?: string | undefined;
+  name?: string | undefined;
   type: string | undefined;
   className: string | undefined;
-  inputClassName: string | undefined;
-  isRequired: boolean;
+  inputClassName?: string | undefined;
+  isRequired?: boolean;
   placeholder: string | undefined;
-  register: UseFormRegister<FieldValues>;
-  value: string | undefined;
-  onChange: () => void;
+  // register: (name: string, options?: RegisterOptions) => UseFormRegisterReturn;
+  inputRef: UseFormRegisterReturn;
+  value?: string | undefined;
+  onChange?: () => void;
 }
 
 function Input({
@@ -21,7 +22,7 @@ function Input({
   inputClassName = "",
   isRequired = true,
   placeholder = "",
-  register,
+  inputRef,
   value = "",
   onChange = () => {},
 }: Input) {
@@ -34,14 +35,14 @@ function Input({
         {label}
       </label>
 
-      {register ? (
+      {inputRef ? (
         <input
           type={type}
           id={name}
           className={`bg-gray-50 border px-3 py-0.5 border-gray-300 text-gray-900 text-clamp-xs rounded-full block w-full focus:ring-blue-500 focus:border-blue-500 lg:w-clamp-form-input md:px-3 ${inputClassName}`}
           placeholder={placeholder}
           required={isRequired}
-          {...register}
+          {...inputRef}
         />
       ) : (
         <input
