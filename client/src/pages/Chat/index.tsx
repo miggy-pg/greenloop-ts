@@ -16,7 +16,7 @@ import { getEndpoint, socketPort } from "../../utils/Helper";
 const Chat = () => {
   document.title = "Green Loop | Chat";
 
-  const loggedInUser = JSON.parse(localStorage.getItem("user:detail"));
+  const loggedInUser = JSON.parse(localStorage.getItem("user:detail") || "{}");
   const [searchParams, setSearchParams] = useSearchParams();
   const [receiverUser, setReceiverUser] = useState({});
 

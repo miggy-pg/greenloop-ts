@@ -6,9 +6,8 @@ interface Input {
   type: string | undefined;
   className: string | undefined;
   inputClassName?: string | undefined;
-  isRequired?: boolean;
+  required?: boolean;
   placeholder: string | undefined;
-  // register: (name: string, options?: RegisterOptions) => UseFormRegisterReturn;
   inputRef: UseFormRegisterReturn;
   value?: string | undefined;
   onChange?: () => void;
@@ -20,12 +19,20 @@ function Input({
   type = "text",
   className = "",
   inputClassName = "",
-  isRequired = true,
+  required = true,
   placeholder = "",
   inputRef,
   value = "",
   onChange = () => {},
 }: Input) {
+  const inputProps = {
+    id: name,
+    type,
+    className: `bg-gray-50 border px-3 py-0.5 border-gray-300 text-gray-900 text-clamp-xs rounded-full block w-full focus:ring-blue-500 focus:border-blue-500 lg:w-clamp-form-input md:px-3 ${inputClassName}`,
+    placeholder,
+    required,
+  };
+
   return (
     <div className={`${className}`}>
       <label
@@ -35,26 +42,7 @@ function Input({
         {label}
       </label>
 
-      {inputRef ? (
-        <input
-          type={type}
-          id={name}
-          className={`bg-gray-50 border px-3 py-0.5 border-gray-300 text-gray-900 text-clamp-xs rounded-full block w-full focus:ring-blue-500 focus:border-blue-500 lg:w-clamp-form-input md:px-3 ${inputClassName}`}
-          placeholder={placeholder}
-          required={isRequired}
-          {...inputRef}
-        />
-      ) : (
-        <input
-          type={type}
-          id={name}
-          value={value}
-          className={`bg-gray-50 border px-3 py-0.5 border-gray-300 text-gray-900 text-clamp-xs rounded-full block w-full focus:ring-blue-500 focus:border-blue-500 lg:w-clamp-form-input md:px-3 ${inputClassName}`}
-          placeholder={placeholder}
-          required={isRequired}
-          onChange={onChange}
-        />
-      )}
+      <input {...inputProps} {...(inputRef ? inputRef : { value, onChange })} />
     </div>
   );
 }

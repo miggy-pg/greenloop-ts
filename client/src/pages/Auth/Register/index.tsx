@@ -1,32 +1,40 @@
+import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 
 import Button from "../../../components/Common/Button/PrimaryButton";
 import Input from "../../../components/Common/Input";
-import leavesImage from "../../assets/images/signup-side-panel.webp";
-import { register as registerUser } from "../../../api/auth";
 import provinceAndMunicipality from "../../../constants/provinceAndMunicipality";
 import organizations from "../../../constants/organizations";
-import { useState } from "react";
+import { register as registerUser } from "../../../api/auth";
 import { UserProps } from "../../../types/user.types";
 
-const organizationType = [
-  { value: "Waste Generator", label: "Waste Generator" },
-  { value: "Recycling Startup", label: "Recycling Startup" },
-  { value: "Informal Waste Sector", label: "Informal Waste Sector" },
-];
+import leavesImage from "../../assets/images/signup-side-panel.webp";
+
 interface Error {
-  data: string;
+  data: string[];
 }
 
 function Register() {
   document.title = "Green Loop | Sign Up";
 
+  const navigate = useNavigate();
+
+  const [places, setPlaces] = useState<string[] | undefined>([]);
+
   const { register, handleSubmit } = useForm({
-    defaultValues: { organizationType: "Waste Generator" },
+    defaultValues: {
+      fullName: "",
+      email: "",
+      username: "",
+      password: "",
+      confirmPassword: "",
+      organization: "Waste Generator",
+      province: "",
+      city: "",
+    },
   });
-  const [places, setPlaces] = useState([]);
 
   const { mutate: handleRegisterUser } = useMutation({
     mutationFn: (data: UserProps) => registerUser(data),
@@ -40,25 +48,25 @@ function Register() {
     },
   });
 
-  const navigate = useNavigate();
-
   const onSubmit: SubmitHandler<UserProps> = (data, ev) => {
     ev?.preventDefault();
     handleRegisterUser(data);
   };
 
-  const handleOnChangeProvince = (ev: React.FormEvent<HTMLFormElement>) => {
+  const handleOnChangeProvince = (ev: React.FormEvent<HTMLInputElement>) => {
     const inputEl = ev.target as HTMLInputElement;
     if (inputEl.id == "provinces" && inputEl.value == "Select a Province") {
       setPlaces([]);
     } else {
       const filteredMunicipalities = provinceAndMunicipality.filter(
         (province) => province.name.includes(inputEl.value)
-      );
-      if (filteredMunicipalities) setPlaces(filteredMunicipalities[0].places);
+      )[0];
+      const municipalities = document.getElementById(
+        "municipalities"
+      ) as HTMLInputElement;
 
-      document.getElementById("municipalities").value =
-        filteredMunicipalities[0].places[0];
+      municipalities.value = filteredMunicipalities.places[0];
+      setPlaces(filteredMunicipalities.places);
     }
   };
 
@@ -85,53 +93,49 @@ function Register() {
             onSubmit={handleSubmit(onSubmit)}
           >
             <Input
-              name="companyName"
-              placeholder="company name"
+              type="text"
+              name="fullName"
+              placeholder="Full Name"
               className="mb-6"
-              register={{ ...register("companyName") }}
+              inputRef={register("fullName")}
             />
 
             <Input
               name="email"
               type="email"
-              placeholder="email"
+              placeholder="Email"
               className="mb-6"
-              register={{ ...register("email") }}
+              inputRef={register("email")}
             />
             <Input
-              id="username"
               type="text"
               name="username"
-              placeholder="username"
+              placeholder="Username"
               className="mb-6"
-              register={{ ...register("username") }}
+              inputRef={register("username")}
             />
             <Input
-              id="password"
               type="password"
               name="password"
-              placeholder="password"
+              placeholder="Password"
               className="mb-1"
-              register={{ ...register("password") }}
+              inputRef={register("password")}
             />
             <Input
-              id="confirmPassword"
               type="password"
               name="confirmPassword"
-              placeholder="confirm password"
+              placeholder="Confirm Password"
               className="mt-5"
-              register={{ ...register("confirmPassword") }}
+              inputRef={register("confirmPassword")}
             />
             <select
-              id="organization-type"
-              name="organizationType"
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-full focus:ring-blue-500 focus:border-blue-500 block py-0.5 mt-5"
-              {...register("organizationType", {
+              {...register("organization", {
                 required: "Please select organization type",
               })}
             >
               {organizations.map((item, index) => (
-                <option id={index} key={index} value={item.value}>
+                <option id={String(index)} key={index} value={item.value}>
                   {item.label}
                 </option>
               ))}
@@ -144,8 +148,8 @@ function Register() {
                 required: "Please select a province",
               })}
             >
-              {mindanaoPlaces.map((province, index) => (
-                <option key={index} value={province.name}>
+              {provinceAndMunicipality.map((province, index) => (
+                <option id={String(index)} key={index} value={province.name}>
                   {province.name}
                 </option>
               ))}
@@ -153,12 +157,12 @@ function Register() {
             <select
               id="cityMunicipality"
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-full focus:ring-blue-500 focus:border-blue-500 block py-0.5 mt-5"
-              {...register("cityMunicipality", {
+              {...register("city", {
                 required: "Please select a city or municipality",
               })}
             >
               {places?.map((place, index) => (
-                <option key={index} value={place}>
+                <option id={String(index)} key={index} value={place}>
                   {place}
                 </option>
               ))}

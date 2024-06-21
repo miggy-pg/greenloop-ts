@@ -44,9 +44,6 @@ function Login() {
     handleSubmitUser(data);
   };
 
-  const password = register("password");
-  const username = register("username");
-
   return (
     <div className="flex h-dvh w-dvw">
       <div className="flex shadow-lg justify-center my-auto w-2/4 h-9/10 items-center max-w-6xl mx-auto lg:flex-col md:items-start md:w-3/5 sm:w-3/4 sm:h-full xsm:w-full xsm:h-screen">
@@ -81,14 +78,14 @@ function Login() {
               type="text"
               placeholder="username"
               className="mb-6"
-              inputRef={username}
+              inputRef={register("username")}
             />
             <Input
               name="password"
               type="password"
               placeholder="password"
               className="mb-1"
-              inputRef={password}
+              inputRef={register("password")}
             />
             <span className="text-right mb-7">
               <span

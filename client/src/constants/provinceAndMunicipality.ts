@@ -1,10 +1,10 @@
-interface ProvinceAndMunicipalityOption {
+export interface ProvinceAndMunicipalityOption {
   name: string;
-  places?: string[];
+  places: string[];
 }
 
 const provinceAndMunicipality: ProvinceAndMunicipalityOption[] = [
-  { name: "Select a Province" },
+  { name: "Select a Province", places: [] },
   {
     name: "Agusan del Norte (incl. City of Butuan)",
     places: [
