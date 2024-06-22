@@ -1,12 +1,13 @@
 import { Link, useNavigate } from "react-router-dom";
 
-import { logout } from "../../api/auth";
-import { UserProps } from "../../types/user.types";
+import { logout } from "../../../api/auth";
+import { UserProps } from "../../../types/user.types";
 
 // TODO: Get User data from single entity/location
 // TODO: Handle null companyId in logout in auth.controller
 function SettingsDropdown({ user }: { user: UserProps }) {
-  const userStorage = JSON.parse(localStorage.getItem("user:detail") || "{}");
+  const storedUserDetail = localStorage.getItem("user:detail");
+  const userDetail = storedUserDetail ? JSON.parse(storedUserDetail) : null;
   const navigate = useNavigate();
 
   const signOut = async () => {
@@ -27,7 +28,7 @@ function SettingsDropdown({ user }: { user: UserProps }) {
         </div>
       </Link>
       <ul className="py-1">
-        {userStorage.isAdmin && (
+        {userDetail?.isAdmin && (
           <li>
             <Link to="dashboard/companies">
               <span

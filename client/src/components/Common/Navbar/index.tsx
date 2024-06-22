@@ -13,7 +13,7 @@ import {
   IoSettings,
 } from "react-icons/io5";
 
-import Notification from "../../../modules/Notification/Desktop";
+import Notification from "../../../pages/Notification/Desktop";
 import SettingsDropdown from "../../Common/SettingsDropdown";
 import Logout from "../Modal/Logout";
 import { useSocketMessage } from "../../../hooks/useSocket";
@@ -57,9 +57,10 @@ const Menus = [
 ];
 
 function Navbar() {
-  const userStorage = JSON.parse(localStorage.getItem("user:detail") || "{}");
+  const storedUserDetail = localStorage.getItem("user:detail");
+  const userDetail = storedUserDetail ? JSON.parse(storedUserDetail) : null;
 
-  const { data: user, isLoading, error } = useGetUser(userStorage?.id);
+  const { data: user, isLoading, error } = useGetUser(userDetail?.id);
 
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -83,7 +84,7 @@ function Navbar() {
     navigate(`/listing?filter=${searchQuery}`);
   };
 
-  const { newMessages, hasReadMessage } = useSocketMessage(userStorage);
+  const { newMessages, hasReadMessage } = useSocketMessage(userDetail);
 
   useEffect(() => {
     window.addEventListener("scroll", () => {

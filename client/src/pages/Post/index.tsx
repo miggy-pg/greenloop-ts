@@ -1,48 +1,74 @@
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { SubmitHandler, useForm } from "react-hook-form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-
 import { IoAddSharp } from "react-icons/io5";
-import ButtonOutline from "../../components/Common/ButtonOutline";
 
-import { useUploadImage } from "../../hooks/useUploadImage";
-import ErrorMessage from "../../components/Common/Message/ErrorMessage";
-import { uploadPost } from "../../api/waste";
+import PrimaryButton from "../../components/Common/Button/PrimaryButton";
+import Error from "../../components/Common/Message/Error";
 import wasteCategories from "../../constants/wasteCategories";
 
+import { createWaste } from "../../api/waste";
+import { useUploadImage } from "../../hooks/useUploadImage";
+import { WasteProps } from "../../types/waste.types";
+
+// TODO: Improve error message in controllers to avoid using more properties
+
+interface Errors {
+  description: { message: string };
+  category?: { message: string };
+  image?: { url: string };
+}
+
+interface Response {
+  description: { message: string };
+}
+
+interface MutationError {
+  response?: {
+    data?: {
+      errors?: Response;
+    };
+  };
+}
+export type FormData = WasteProps & {
+  image: string | ArrayBuffer | null | string[]; // or your specific type for image
+  user: string;
+};
 const Post = () => {
   document.title = "Green Loop | Post";
 
-  const company = JSON.parse(localStorage.getItem("user:detail"));
+  const [errors, setErrors] = useState<Errors | null>(null);
 
-  const [errors, setErrors] = useState({});
+  const storedUserDetail = localStorage.getItem("user:detail");
+  const user = storedUserDetail ? JSON.parse(storedUserDetail) : null;
+
   const { image, imagePreview, fetchImage, setImagePreview, setImage } =
     useUploadImage();
 
-  const { register, handleSubmit, reset } = useForm();
+  const { register, handleSubmit, reset } = useForm<WasteProps>();
 
   const queryClient = useQueryClient();
 
-  const { mutate: createWaste, isLoading: isCreating } = useMutation({
-    mutationFn: (formData) => uploadPost(formData),
+  const { mutate: handleCreateWaste, isPending: isCreating } = useMutation({
+    mutationFn: (formData: WasteProps) => createWaste(formData),
     onSuccess: () => {
       alert("Post uploaded successfully");
       queryClient.invalidateQueries({ queryKey: ["companyWastes"] });
       reset();
-      setImagePreview("");
+      setImagePreview(null);
       setImage([]);
-      const wasteLength = localStorage.getItem("wasteLength");
-      localStorage.setItem("wasteLength", Number(wasteLength) + 1);
+      const wasteLength = Number(localStorage.getItem("wasteLength"));
+      localStorage.setItem("wasteLength", String(wasteLength + 1));
     },
-    onError: (error) => {
+    onError: (error: MutationError) => {
       console.log("errors: ", error);
-      setErrors(error?.response.data.errors);
+      if (error.response?.data?.errors) setErrors(error?.response.data.errors);
     },
   });
 
-  const onSubmit = (data) => {
-    const formData = { ...data, image, company: company?.id };
-    createWaste(formData);
+  const onSubmit: SubmitHandler<WasteProps> = (data) => {
+    const formData: FormData = { ...data, image, user: user?.id };
+    handleCreateWaste(formData);
   };
 
   return (
@@ -62,24 +88,22 @@ const Post = () => {
                 </div>
               </footer>
               <hr className="py-3" />
-              {errors?.post && <ErrorMessage error={errors?.post.message} />}
+              {errors?.description && (
+                <Error error={errors?.description.message} />
+              )}
 
               <textarea
-                id="post"
-                name="post"
-                rows="4"
+                rows={4}
                 className="text-gray-900 text-left w-full overflow-y-hidden mb-3 focus:outline-none focus: border-0"
                 placeholder="Say something about the waste"
-                {...register("post")}
+                {...register("description")}
               />
               <div className="grid">
-                {errors?.wasteCategory && (
-                  <ErrorMessage error={errors?.wasteCategory.message} />
-                )}
+                {errors?.category && <Error error={errors?.category.message} />}
                 <select
-                  id="wasteCategory"
+                  id="category"
                   className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-2/5 p-2.5 md:w-[10rem]"
-                  {...register("wasteCategory")}
+                  {...register("category")}
                 >
                   <option value="">Select an option</option>
                   {wasteCategories?.map((category) => (
@@ -94,8 +118,8 @@ const Post = () => {
             {imagePreview ? (
               <>
                 <img
-                  src={imagePreview ? URL.createObjectURL(imagePreview) : null}
-                  alt={imagePreview ? imagePreview.name : null}
+                  src={imagePreview ? URL.createObjectURL(imagePreview) : ""}
+                  alt={imagePreview ? imagePreview.name : ""}
                   className="relative w-full h-[20rem] border-2 bg-white rounded-lg flex justify-center items-center mb-5"
                 />
                 <label
@@ -130,19 +154,16 @@ const Post = () => {
                     <p className="text-slate-400 text-clamp-base">Add Image</p>
                   </label>
                 </div>
-                {errors["image.url"] && (
-                  <ErrorMessage error={errors["image.url"].message} />
-                )}
+                {errors?.image?.url && <Error error={errors.image.url} />}
               </>
             )}
 
-            <ButtonOutline
+            <PrimaryButton
               disabled={isCreating}
               className="w-full my-10 sm:text-clamp-xs sm:py-2"
               type="submit"
-            >
-              Upload
-            </ButtonOutline>
+              label="Upload"
+            />
           </div>
         </form>
       </div>

@@ -1,12 +1,14 @@
 import { useNavigate } from "react-router-dom";
-import { logout } from "../../../api/auth";
+import { logout } from "../../../../api/auth";
 
 function Logout({
   setIsLoggingOut,
 }: {
   setIsLoggingOut: (logout: boolean) => void;
 }) {
-  const user = JSON.parse(localStorage.getItem("user:detail") || "{}");
+  const storedUserDetail = localStorage.getItem("user:detail");
+  const user = storedUserDetail ? JSON.parse(storedUserDetail) : null;
+
   const navigate = useNavigate();
 
   const handleSignOut = async () => {

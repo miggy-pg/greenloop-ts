@@ -1,10 +1,12 @@
 import { useState } from "react";
 
 export const useUploadImage = () => {
-  const [image, setImage] = useState<string | ArrayBuffer | null>(null);
+  const [image, setImage] = useState<string | ArrayBuffer | null | string[]>(
+    null
+  );
   const [imagePreview, setImagePreview] = useState<File | null>(null);
 
-  const fetchImage = (e: React.FormEvent<HTMLFormElement>) => {
+  const fetchImage = (e: React.FormEvent<HTMLInputElement>) => {
     const target = e.target as HTMLInputElement;
     const file = (target.files as FileList)[0];
 

@@ -1,7 +1,7 @@
 export type WasteProps = {
   description: string;
   category: string;
-  image: string;
+  image: string | ArrayBuffer | null | string[];
   user: string;
   available?: boolean;
 };
