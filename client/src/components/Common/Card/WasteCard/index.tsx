@@ -6,14 +6,14 @@ import { IoMdTime } from "react-icons/io";
 import { HiOutlineDotsHorizontal } from "react-icons/hi";
 
 import Dropdown from "../../Dropdown";
-import { formatDateTime } from "../../../utils/formatDateTime";
-import { plasticColor } from "../../../utils/plasticColor";
-import { updateWasteAvailability } from "../../../api/waste";
-import { Payload } from "../../../types/waste.types";
+import { formatDateTime } from "../../../../utils/formatDateTime";
+import { plasticColor } from "../../../../utils/plasticColor";
+import { updateWasteAvailability } from "../../../../api/waste";
+import { Payload } from "../../../../types/waste.type";
 
 import defaultImage from "../../../assets/default-image.webp";
 import wasteDefaultImage from "../../../assets/waste-default-image.webp";
-import { UserProps } from "../../../types/user.types";
+import { UserProps } from "../../../../types/user.type";
 
 interface WasteCardProps {
   available: boolean;

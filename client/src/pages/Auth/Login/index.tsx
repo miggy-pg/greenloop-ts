@@ -6,7 +6,7 @@ import Button from "../../../components/Common/Button/PrimaryButton";
 import Input from "../../../components/Common/Input";
 
 import { login } from "../../../api/auth";
-import { UserProps } from "../../../types/user.types";
+import { UserProps } from "../../../types/user.type";
 
 import forrestImage from "../../assets/images/login-side-panel.webp";
 import greenLoopLogo from "../../assets/images/greenloop-logo.png";

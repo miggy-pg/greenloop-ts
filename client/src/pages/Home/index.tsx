@@ -1,25 +1,27 @@
 import { useEffect, useMemo } from "react";
 
 import Body from "../../components/Common/Body";
-import NoWasteCard from "../../components/Common/Cards/NoWasteCard";
-import GreetingCard from "../../components/Common/Cards/GreetingCard";
-import WasteCard from "../../components/Common/Cards/WasteCard";
+import NoWasteCard from "../../components/Common/Card/NoWasteCard";
+import GreetingCard from "../../components/Common/Card/GreetingCard";
+import WasteCard from "../../components/Common/Card/WasteCard";
 import SKWasteCard from "../../components/Common/Skeleton/SKWasteCard";
 import SKNoWasteCard from "../../components/Common/Skeleton/SKNoWasteCard";
-import defaultImage from "../../assets/images/default-image.jpg";
-import wasteDefaultImage from "../../assets/images/waste-default-image.webp";
 import { useWastes } from "../../hooks/useWaste";
 
-const Home = () => {
+import defaultImage from "../../assets/images/default-image.jpg";
+import wasteDefaultImage from "../../assets/images/waste-default-image.webp";
+
+function Home() {
   document.title = "Green Loop | Home";
 
   const storageWasteLength = Number(localStorage.getItem("wasteLength"));
-  const user = JSON.parse(localStorage.getItem("user:detail"));
+  const storedUser = localStorage.getItem("user:detail");
+  const user = storedUser ? JSON.parse(storedUser) : null;
   const isLoggedIn = user !== null || false;
 
   const wasteQuery = useWastes();
   const {
-    wasteQuery: { data: wastes },
+    data: wastes,
     isLoading,
     error,
   } = useMemo(() => wasteQuery, [wasteQuery]);
@@ -57,6 +59,6 @@ const Home = () => {
       )}
     </Body>
   );
-};
+}
 
 export default Home;

@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Table from "../../Common/Table";
 import StyledButton from "../../Common/Button/StyledButton";
 import defaultImage from "../../../assets/images/default-image.jpg";
-import { UserProps } from "../../../types/user.types";
+import { UserProps } from "../../../types/user.type";
 
 interface CompanyList {
   company: UserProps;

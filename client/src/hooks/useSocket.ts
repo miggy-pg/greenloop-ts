@@ -5,7 +5,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { updateHasReadMessage } from "../api/message";
 import { socketPort } from "../utils/socket";
-import { UserProps } from "../types/user.types";
+import { UserProps } from "../types/user.type";
 
 interface Message {
   id: string;

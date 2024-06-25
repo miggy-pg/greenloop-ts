@@ -2,8 +2,37 @@ import { useRef } from "react";
 import { Link } from "react-router-dom";
 import defaultImage from "../../../assets/images/default-image.jpg";
 
-const Notification = ({ newMessages, hasReadMessage }) => {
-  const ref = useRef();
+interface User {
+  fullName: string;
+  email: string;
+  id: string;
+  image: { public_id: string; url: string };
+}
+
+interface UserImage {
+  url: string;
+}
+interface MessageDetails {
+  id: string;
+  msg: string;
+  msgImage: { url: string };
+  user: { image: UserImage };
+}
+
+interface Message {
+  hasRead: boolean;
+  conversationId: string;
+  message: MessageDetails;
+  user: User;
+  _id?: string;
+  length: number;
+}
+
+function Notification(
+  newMessages: Message[],
+  hasReadMessage: (message: string | null, messages?: boolean) => void
+) {
+  const ref = useRef<HTMLDivElement>(null);
 
   return (
     <div
@@ -15,7 +44,7 @@ const Notification = ({ newMessages, hasReadMessage }) => {
         Notifications
       </header>
       <main className="flex-1 overflow-y-scroll h-[19rem]">
-        {newMessages.map((message) => {
+        {newMessages.map((message: Message) => {
           return (
             <Link
               to={`chats?id=${message?.conversationId}`}
@@ -31,14 +60,14 @@ const Notification = ({ newMessages, hasReadMessage }) => {
                       ? message?.message?.user?.image?.url
                       : defaultImage
                   }
-                  alt={message?.user?.companyName}
+                  alt={message?.user?.fullName}
                 />
               </div>
               <div className="w-full pl-3 text-left">
                 <div className="text-gray-500 font-normal text-clamp-xs mb-1.5 ">
                   New message from {""}
                   <span className="font-semibold text-gray-900">
-                    {message.company.companyName}
+                    {message?.user?.fullName}
                   </span>
                   : {message?.message?.msg}
                   <blockquote className="text-clamp-xs text-gray-500 font-light">
@@ -49,7 +78,7 @@ const Notification = ({ newMessages, hasReadMessage }) => {
             </Link>
           );
         })}
-        {!newMessages.length && (
+        {!newMessages?.length && (
           <div className="flex px-4 py-3">
             <div className="w-full pl-3">
               <div className="text-gray-500 font-normal text-sm mb-1.5 text-center">
@@ -67,6 +96,6 @@ const Notification = ({ newMessages, hasReadMessage }) => {
       </footer>
     </div>
   );
-};
+}
 
 export default Notification;

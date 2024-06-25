@@ -1,4 +1,4 @@
-import { UserWaste } from "./waste.types";
+import { UserWaste } from "./waste.type";
 
 export type UserProps = {
   fullName: string;

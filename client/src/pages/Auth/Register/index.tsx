@@ -8,7 +8,7 @@ import Input from "../../../components/Common/Input";
 import provinceAndMunicipality from "../../../constants/provinceAndMunicipality";
 import organizations from "../../../constants/organizations";
 import { register as registerUser } from "../../../api/auth";
-import { UserProps } from "../../../types/user.types";
+import { UserProps } from "../../../types/user.type";
 
 import leavesImage from "../../assets/images/signup-side-panel.webp";
 

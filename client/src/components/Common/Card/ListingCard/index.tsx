@@ -3,15 +3,15 @@ import { useForm } from "react-hook-form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import Dropdown from "../../Dropdown";
-import { updateWasteAvailability } from "../../../api/waste";
-import { plasticColor } from "../../../utils/plasticColor";
-import { formatDateTime } from "../../../utils/formatDateTime";
+import { updateWasteAvailability } from "../../../../api/waste";
+import { plasticColor } from "../../../../utils/plasticColor";
+import { formatDateTime } from "../../../../utils/formatDateTime";
 import { IoMdTime } from "react-icons/io";
 import { HiOutlineDotsHorizontal } from "react-icons/hi";
-import { UserProps } from "../../../types/user.types";
+import { UserProps } from "../../../../types/user.type";
 
 import defaultImage from "../../../../assets/images/waste-default-image.webp";
-import { Payload } from "../../../types/waste.types";
+import { Payload } from "../../../../types/waste.type";
 
 interface ListingCardProps {
   available: boolean;

@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 
 import { logout } from "../../../api/auth";
-import { UserProps } from "../../../types/user.types";
+import { UserProps } from "../../../types/user.type";
 
 // TODO: Get User data from single entity/location
 // TODO: Handle null companyId in logout in auth.controller

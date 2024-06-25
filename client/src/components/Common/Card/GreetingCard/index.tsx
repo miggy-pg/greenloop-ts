@@ -1,4 +1,4 @@
-import { UserProps } from "../../../types/user.types";
+import { UserProps } from "../../../../types/user.type";
 
 const GreetingCard = ({ user }: { user: UserProps }) => {
   return (

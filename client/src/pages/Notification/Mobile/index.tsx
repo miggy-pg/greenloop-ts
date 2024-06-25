@@ -1,11 +1,13 @@
 import { Link } from "react-router-dom";
 
-import { useSocketMessages } from "../../../hooks/useSocket";
+import { useSocketMessage } from "../../../hooks/useSocket";
 import defaultImage from "../../../assets/images/default-image.jpg";
+import { Message } from "../../../types/message.type";
 
-const MobileNotification = () => {
-  const user = JSON.parse(localStorage.getItem("user:detail"));
-  const { newMessages, hasReadMessage } = useSocketMessages(user);
+function MobileNotification() {
+  const storedUser = localStorage.getItem("user:detail");
+  const user = storedUser ? JSON.parse(storedUser) : null;
+  const { newMessages, hasReadMessage } = useSocketMessage(user);
 
   return (
     <div className="w-full h-full bg-white" id="profile">
@@ -16,7 +18,7 @@ const MobileNotification = () => {
               Notifications
             </h3>
             <div className="divide-y divide-gray-200">
-              {newMessages.map((message) => (
+              {newMessages.map((message: Message) => (
                 <Link
                   to={`/chats?id=${message?.conversationId}`}
                   key={message.conversationId}
@@ -30,19 +32,19 @@ const MobileNotification = () => {
                         ? message?.message?.user?.image?.url
                         : defaultImage
                     }
-                    alt={message?.user?.companyName}
+                    alt={message?.user?.fullName}
                   />
                   <div className="text-gray-500 font-normal text-clamp-xs mb-1 ">
                     New message from {""}
                     <span className="font-semibold text-gray-900">
-                      {message.company.companyName}
+                      {message?.user?.fullName}
                     </span>
                     : <br />
                     <p className="text-clamp-base font-semibold text-gray-700">
-                      {message.message.msg}
+                      {message?.message.msg}
                     </p>
                     <blockquote className="text-clamp-xs text-gray-500 font-light">
-                      {message.message.msgImage.url && "Attached an image"}
+                      {message?.message.msgImage.url && "Attached an image"}
                     </blockquote>
                   </div>
                 </Link>
@@ -58,6 +60,6 @@ const MobileNotification = () => {
       </div>
     </div>
   );
-};
+}
 
 export default MobileNotification;

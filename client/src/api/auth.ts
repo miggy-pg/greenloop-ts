@@ -1,6 +1,6 @@
 import http from "../services/httpService";
-import { CredentialProps } from "../types/auth.types";
-import { UserProps } from "../types/user.types";
+import { CredentialProps } from "../types/auth.type";
+import { UserProps } from "../types/user.type";
 
 export const login = async (credential: CredentialProps): Promise<any> =>
   await http.post<void>("/sign-in", credential);

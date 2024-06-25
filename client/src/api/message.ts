@@ -1,5 +1,5 @@
 import http from "../services/httpService";
-import { MessageProps } from "../types/message.types";
+import { MessageProps } from "../types/message.type";
 
 export const sendMessage = async (message: MessageProps) =>
   await http.post("/message", message);

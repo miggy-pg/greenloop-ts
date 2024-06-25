@@ -9,7 +9,7 @@ import wasteCategories from "../../constants/wasteCategories";
 
 import { createWaste } from "../../api/waste";
 import { useUploadImage } from "../../hooks/useUploadImage";
-import { WasteProps } from "../../types/waste.types";
+import { WasteProps } from "../../types/waste.type";
 
 // TODO: Improve error message in controllers to avoid using more properties
 
@@ -34,7 +34,7 @@ export type FormData = WasteProps & {
   image: string | ArrayBuffer | null | string[]; // or your specific type for image
   user: string;
 };
-const Post = () => {
+function Post() {
   document.title = "Green Loop | Post";
 
   const [errors, setErrors] = useState<Errors | null>(null);
@@ -169,6 +169,6 @@ const Post = () => {
       </div>
     </div>
   );
-};
+}
 
 export default Post;
