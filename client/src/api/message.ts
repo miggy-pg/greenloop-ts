@@ -11,7 +11,9 @@ export const getMessage = async (
   conversationId: string,
   userId: string,
   receiverId: string
-) =>
-  await http.get(
+) => {
+  const response = await http.get(
     `/messages/${conversationId}?senderId=${userId}&&receiverId=${receiverId}`
   );
+  return response.data;
+};

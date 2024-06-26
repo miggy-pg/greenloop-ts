@@ -5,8 +5,10 @@ type Conversation = {
   receiverId: string;
 };
 
-export const getConversation = async (companyId: string) =>
-  await http.get(`/conversations/${companyId}`);
+export const getConversation = async (companyId: string) => {
+  const response = await http.get(`/conversations/${companyId}`);
+  return response.data;
+};
 
 export const createConversation = async (conversation: Conversation) =>
   await http.post(`/conversations`, conversation);

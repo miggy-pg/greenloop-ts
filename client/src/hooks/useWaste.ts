@@ -1,9 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { getWastes } from "../api/waste";
 
-export const useWastes = () => {
+export const useGetWastes = () => {
   const {
-    data = [],
+    data: wastes = [],
     isLoading,
     error,
   } = useQuery({
@@ -11,5 +11,5 @@ export const useWastes = () => {
     queryFn: getWastes,
   });
 
-  return { data, isLoading, error };
+  return { wastes, isLoading, error };
 };

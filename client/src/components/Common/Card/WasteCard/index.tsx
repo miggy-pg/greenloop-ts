@@ -2,49 +2,35 @@ import { Link } from "react-router-dom";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 
-import { IoMdTime } from "react-icons/io";
-import { HiOutlineDotsHorizontal } from "react-icons/hi";
-
 import Dropdown from "../../Dropdown";
 import { formatDateTime } from "../../../../utils/formatDateTime";
 import { plasticColor } from "../../../../utils/plasticColor";
 import { updateWasteAvailability } from "../../../../api/waste";
-import { Payload } from "../../../../types/waste.type";
+import { Payload, WasteCardProps } from "../../../../types/waste.type";
+import { UserProps } from "../../../../types/user.type";
 
 import defaultImage from "../../../assets/default-image.webp";
 import wasteDefaultImage from "../../../assets/waste-default-image.webp";
-import { UserProps } from "../../../../types/user.type";
-
-interface WasteCardProps {
-  available: boolean;
-  createdAt: Date;
-  user: UserProps;
-  id: string;
-  post: string;
-  wasteCategory: string;
-  image: {
-    public_id: string;
-    url: string;
-  };
-}
+import { IoMdTime } from "react-icons/io";
+import { HiOutlineDotsHorizontal } from "react-icons/hi";
 
 const WasteCard = ({
-  props,
+  waste,
   loggedInUser,
 }: {
-  props: WasteCardProps;
+  waste: WasteCardProps;
   loggedInUser: UserProps;
 }) => {
   const {
     id: wasteId,
     post,
     image,
-    wasteCategory,
+    category,
     user,
     createdAt,
     available,
-  } = props;
-  const transformedTexts = plasticColor(wasteCategory);
+  } = waste;
+  const transformedTexts = plasticColor(category);
 
   const queryClient = useQueryClient();
 
@@ -69,7 +55,6 @@ const WasteCard = ({
     });
   };
 
-  console.log("listng: ", props);
   return (
     <div className="bg-white border border-gray-200 shadow-sm rounded-3xl my-2">
       <article className="py-6 px-6 text-gray-800 xsm:px-4">
@@ -141,7 +126,7 @@ const WasteCard = ({
           <p
             className={`text-left py-1 text-xxs rounded-full border ${transformedTexts} p-3 xsm:text-xxs`}
           >
-            {wasteCategory}
+            {category}
           </p>
         </div>
       </article>

@@ -1,3 +1,5 @@
+import { UserProps } from "./user.type";
+
 export type WasteProps = {
   description: string;
   category: string;
@@ -18,4 +20,16 @@ export interface UserWaste {
   image: { public_id: string; url: string };
   post: string;
   category: string;
+}
+export interface WasteCardProps {
+  available: boolean;
+  createdAt: Date;
+  user: UserProps;
+  id: string;
+  post: string;
+  category: string;
+  image: {
+    public_id: string;
+    url: string;
+  };
 }

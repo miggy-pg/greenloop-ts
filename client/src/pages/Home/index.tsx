@@ -3,13 +3,12 @@ import { useEffect, useMemo } from "react";
 import Body from "../../components/Common/Body";
 import NoWasteCard from "../../components/Common/Card/NoWasteCard";
 import GreetingCard from "../../components/Common/Card/GreetingCard";
-import WasteCard from "../../components/Common/Card/WasteCard";
+import WasteCard, {
+  WasteCardProps,
+} from "../../components/Common/Card/WasteCard";
 import SKWasteCard from "../../components/Common/Skeleton/SKWasteCard";
 import SKNoWasteCard from "../../components/Common/Skeleton/SKNoWasteCard";
-import { useWastes } from "../../hooks/useWaste";
-
-import defaultImage from "../../assets/images/default-image.jpg";
-import wasteDefaultImage from "../../assets/images/waste-default-image.webp";
+import { useGetWastes } from "../../hooks/useWaste";
 
 function Home() {
   document.title = "Green Loop | Home";
@@ -19,17 +18,13 @@ function Home() {
   const user = storedUser ? JSON.parse(storedUser) : null;
   const isLoggedIn = user !== null || false;
 
-  const wasteQuery = useWastes();
-  const {
-    data: wastes,
-    isLoading,
-    error,
-  } = useMemo(() => wasteQuery, [wasteQuery]);
+  const wasteQuery = useGetWastes();
+  const { wastes, isLoading, error } = useMemo(() => wasteQuery, [wasteQuery]);
 
-  const wasteLength = wastes?.length || 0;
+  const wasteLength = String(wastes?.length) || 0;
 
   useEffect(
-    () => localStorage.setItem("wasteLength", wasteLength || 0),
+    () => localStorage.setItem("wasteLength", wasteLength || ""),
     [wasteLength]
   );
   if (error) return <h1>Error: {error.message}</h1>;
@@ -44,16 +39,10 @@ function Home() {
 
           {isLoading
             ? Array.from({ length: storageWasteLength }, (_, index) => (
-                <SKWasteCard key={index} index={index} />
+                <SKWasteCard key={index} />
               ))
-            : wastes?.map((waste, index) => (
-                <WasteCard
-                  key={index}
-                  props={waste}
-                  defaultImage={defaultImage}
-                  wasteDefaultImage={wasteDefaultImage}
-                  loggedInUser={user}
-                />
+            : wastes?.map((waste: WasteCardProps, index: number) => (
+                <WasteCard key={index} waste={waste} loggedInUser={user} />
               ))}
         </div>
       )}

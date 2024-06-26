@@ -1,6 +1,6 @@
 interface BodyProps {
   children: React.ReactNode;
-  bodyClass: HTMLDivElement;
+  bodyClass: string;
   pageId: string;
 }
 
