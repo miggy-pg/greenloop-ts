@@ -53,8 +53,8 @@ function Register() {
     handleRegisterUser(data);
   };
 
-  const handleOnChangeProvince = (ev: React.FormEvent<HTMLInputElement>) => {
-    const inputEl = ev.target as HTMLInputElement;
+  const handleOnChangeProvince = (event: React.FormEvent<HTMLInputElement>) => {
+    const inputEl = event.target as HTMLInputElement;
     if (inputEl.id == "provinces" && inputEl.value == "Select a Province") {
       setPlaces([]);
     } else {

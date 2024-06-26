@@ -3,12 +3,11 @@ import { useEffect, useMemo } from "react";
 import Body from "../../components/Common/Body";
 import NoWasteCard from "../../components/Common/Card/NoWasteCard";
 import GreetingCard from "../../components/Common/Card/GreetingCard";
-import WasteCard, {
-  WasteCardProps,
-} from "../../components/Common/Card/WasteCard";
+import WasteCard from "../../components/Common/Card/WasteCard";
 import SKWasteCard from "../../components/Common/Skeleton/SKWasteCard";
 import SKNoWasteCard from "../../components/Common/Skeleton/SKNoWasteCard";
 import { useGetWastes } from "../../hooks/useWaste";
+import { WasteCardProps } from "../../types/waste.type";
 
 function Home() {
   document.title = "Green Loop | Home";

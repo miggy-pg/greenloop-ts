@@ -6,7 +6,7 @@ import Dropdown from "../../Dropdown";
 import { formatDateTime } from "../../../../utils/formatDateTime";
 import { plasticColor } from "../../../../utils/plasticColor";
 import { updateWasteAvailability } from "../../../../api/waste";
-import { Payload, WasteCardProps } from "../../../../types/waste.type";
+import { WasteAvailable, WasteCardProps } from "../../../../types/waste.type";
 import { UserProps } from "../../../../types/user.type";
 
 import defaultImage from "../../../assets/default-image.webp";
@@ -37,7 +37,7 @@ const WasteCard = ({
   const { handleSubmit } = useForm();
 
   const { mutate: handleUpdateWasteAvailability } = useMutation({
-    mutationFn: ({ wasteId, available }: Payload) => {
+    mutationFn: ({ wasteId, available }: WasteAvailable) => {
       return updateWasteAvailability(wasteId, {
         available: available,
       });

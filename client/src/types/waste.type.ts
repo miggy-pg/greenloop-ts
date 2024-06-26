@@ -8,7 +8,7 @@ export type WasteProps = {
   available?: boolean;
 };
 
-export interface Payload {
+export interface WasteAvailable {
   wasteId: string;
   available: boolean;
 }

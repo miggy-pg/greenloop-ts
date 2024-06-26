@@ -60,7 +60,7 @@ function Navbar() {
   const storedUserDetail = localStorage.getItem("user:detail");
   const userDetail = storedUserDetail ? JSON.parse(storedUserDetail) : null;
 
-  const { data: user, isLoading, error } = useGetUser(userDetail?.id);
+  const { user, isLoading, error } = useGetUser(userDetail?.id);
 
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();

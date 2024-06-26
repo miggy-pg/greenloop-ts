@@ -1,57 +1,62 @@
 import { useMemo, useState } from "react";
+import { Form } from "react-router-dom";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 
 import Table from "../../../components/Common/Table";
 import CompanyList from "../../../components/Management/CompanyList";
-import { createCompany, deleteCompany, updateCompany } from "../../api/company";
+import { createUser, deleteUser, updateUser } from "../../../api/user";
 import { useUploadImage } from "../../../hooks/useUploadImage";
-import { useFetchCompanies } from "../../hooks/useCompany";
-import { userHeader } from "../../constants/userHeader";
+import { useGetUsers } from "../../../hooks/useUser";
+
+import provinceAndMunicipality from "../../../constants/provinceAndMunicipality";
+import organizations from "../../../constants/organizations";
+import userTableColumn from "../../../constants/userTableColumn";
+import { UserProps } from "../../../types/user.type";
 
 import defaultImage from "../../assets/images/default-image.jpg";
-import mindanaoPlaces from "../../constants/mindanaoPlaces";
-import { organizationType } from "../../constants/organizationType";
 
 export default function Users() {
   document.title = "Green Loop | Dashboard";
   const queryClient = useQueryClient();
 
-  const [companyData, setCompanyData] = useState({});
+  const [user, setUser] = useState<UserProps | null>(null);
   const [showModal, setShowModal] = useState(false);
-  const [places, setPlaces] = useState([]);
+  const [places, setPlaces] = useState<string[] | undefined>([]);
 
-  const {
-    companiesData: { data: allCompanies },
-  } = useFetchCompanies();
+  const { users } = useGetUsers();
 
   const { image, fetchImage, imagePreview, setImage, setImagePreview } =
     useUploadImage();
 
   const { register, handleSubmit, reset } = useForm({
     defaultValues: {
-      isAdmin: companyData?.isAdmin,
-      cityMunicipality: companyData?.cityMunicipality,
+      isAdmin: user?.isAdmin,
+      cityMunicipality: user?.city,
     },
   });
 
-  const handleOnChangeProvince = (e) => {
-    if (e.target.id == "provinces" && e.target.value == "Select a Province") {
+  const handleOnChangeProvince = (event: React.FormEvent<HTMLInputElement>) => {
+    const inputEl = event.target as HTMLInputElement;
+    if (inputEl.id == "provinces" && inputEl.value == "Select a Province") {
       setPlaces([]);
     } else {
-      const filteredMunicipalities = mindanaoPlaces.filter((province) =>
-        province.name.includes(e.target.value)
-      );
-      setPlaces(filteredMunicipalities[0].places);
+      const filteredMunicipalities = provinceAndMunicipality.filter(
+        (province) => province.name.includes(inputEl.value)
+      )[0];
+      const municipalities = document.getElementById(
+        "municipalities"
+      ) as HTMLInputElement;
+
+      municipalities.value = filteredMunicipalities.places[0];
+      setPlaces(filteredMunicipalities.places);
     }
   };
 
-  const getCompanyData = (companyId) => {
-    const companyInfo = allCompanies.filter(
-      (company) => company.id == companyId
-    );
-    setCompanyData(companyInfo[0]);
-    const filteredMunicipalities = mindanaoPlaces.filter((province) =>
+  const getCompanyData = (userId: string) => {
+    const companyInfo = users.filter((user: UserProps) => user.id == userId);
+    setUser(companyInfo[0]);
+    const filteredMunicipalities = provinceAndMunicipality.filter((province) =>
       province.name.includes(companyInfo[0].province)
     )[0];
     setPlaces(filteredMunicipalities.places);
@@ -59,25 +64,25 @@ export default function Users() {
   };
 
   const { mutate: handleCreateCompany } = useMutation({
-    mutationFn: (data) => createCompany(data),
+    mutationFn: (data: UserProps) => createUser(data),
     onSuccess: () => {
       alert("Company created successfully");
       queryClient.invalidateQueries({ queryKey: ["companies"] });
       reset();
       setShowModal(false);
-      setCompanyData({});
+      setUser({});
       setImagePreview("");
       setImage("");
     },
   });
 
   const { mutate: handleUpdateCompany } = useMutation({
-    mutationFn: (data) => updateCompany(data.companyId, data.formData),
+    mutationFn: (data) => updateUser(data.companyId, data.formData),
     onSuccess: () => {
       alert("Company updated successfully");
       queryClient.invalidateQueries({ queryKey: ["companies"] });
       reset();
-      setCompanyData({});
+      setUser({});
       setImagePreview("");
       setImage([]);
       setShowModal(false);
@@ -89,7 +94,7 @@ export default function Users() {
   });
 
   const { mutate: handleDeleteCompany } = useMutation({
-    mutationFn: (companyId) => deleteCompany(companyId),
+    mutationFn: (companyId) => deleteUser(companyId),
     onSuccess: () => {
       alert("Company has been deleted");
       queryClient.invalidateQueries({ queryKey: ["companies"] });
@@ -98,23 +103,23 @@ export default function Users() {
 
   const onSubmit = (data) => {
     const formData = { ...data, image };
-    companyData?.id
-      ? handleUpdateCompany({ companyId: companyData.id, formData: formData })
+    user?.id
+      ? handleUpdateCompany({ companyId: user.id, formData: formData })
       : handleCreateCompany({ ...formData, onAdminCreated: true });
   };
 
   const onClose = () => {
     setShowModal(false);
-    setCompanyData({});
+    setUser({});
     setImagePreview("");
     setImage("");
   };
 
   useMemo(() => {
-    reset(companyData);
-  }, [companyData, reset]);
+    reset(user);
+  }, [user, reset]);
 
-  console.log("companyData: ", companyData);
+  console.log("user: ", user);
   return (
     <div className="overflow-x-scroll">
       <div className="px-4 justify-start mb-5">
@@ -130,13 +135,13 @@ export default function Users() {
         <div className="shadow rounded-lg">
           <Table>
             <Table.Header
-              data={userHeader}
+              data={userTableColumn}
               render={(header, index) => (
                 <Table.Column key={index} header={header} />
               )}
             />
             <Table.Body>
-              {allCompanies?.map((company, i) => (
+              {users?.map((company, i) => (
                 <CompanyList
                   key={i}
                   company={company}
@@ -150,14 +155,14 @@ export default function Users() {
             <>
               <div className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none">
                 <div className="relative w-auto my-6 mx-auto max-w-2xl">
-                  <form
+                  <Form
                     onSubmit={handleSubmit(onSubmit)}
                     encType="multipart/form-data"
                   >
                     <div className="border-0 rounded-lg shadow-lg relative flex flex-col w-108 bg-white outline-none focus:outline-none xsm:h-3/4 xsm:w-80">
                       <div className="flex items-center justify-center p-4 border-solid mx-auto border-blueGray-200 rounded-t md:p-2">
                         <h3 className="text-2xl font-semibold md:text-clamp">
-                          {companyData.id ? "Edit Company" : "Create Company"}
+                          {user.id ? "Edit Company" : "Create Company"}
                         </h3>
                       </div>
                       <hr />
@@ -289,13 +294,13 @@ export default function Users() {
                               <td className="px-6 py-2">
                                 <select
                                   id="organization-type"
-                                  name="organizationType"
+                                  name="organizations"
                                   className="bg-gray-50 border w-44 border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-1.5"
-                                  {...register("organizationType", {
+                                  {...register("organizations", {
                                     required: "Please select organization type",
                                   })}
                                 >
-                                  {organizationType?.map((item, index) => (
+                                  {organizations?.map((item, index) => (
                                     <option
                                       id={index}
                                       key={item.value}
@@ -323,11 +328,16 @@ export default function Users() {
                                     required: "Please select a province",
                                   })}
                                 >
-                                  {mindanaoPlaces.map((province, index) => (
-                                    <option key={index} value={province?.name}>
-                                      {province.name}
-                                    </option>
-                                  ))}
+                                  {proviceAndMunicipality.map(
+                                    (province, index) => (
+                                      <option
+                                        key={index}
+                                        value={province?.name}
+                                      >
+                                        {province.name}
+                                      </option>
+                                    )
+                                  )}
                                 </select>
                               </td>
                             </tr>
@@ -387,11 +397,11 @@ export default function Users() {
                           className="bg-[#31572C] text-white active:bg-[#2e4d29] font-bold uppercase text-xs px-6 py-3 rounded-full shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150 md:text-clamp-button md:px-3 md:py-1"
                           type="submit"
                         >
-                          {companyData?.id ? "Update" : "Create Company"}
+                          {user?.id ? "Update" : "Create Company"}
                         </button>
                       </div>
                     </div>
-                  </form>
+                  </Form>
                 </div>
               </div>
               <div className="opacity-25 fixed inset-0 z-40 bg-black" />
