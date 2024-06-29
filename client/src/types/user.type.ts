@@ -11,7 +11,7 @@ export type UserProps = {
   confirmPassword?: string;
   id?: string;
   _id?: string;
-  image?: string;
+  image?: string | string[] | null | ArrayBuffer;
   isAdmin?: boolean;
   token?: string;
   wastes?: UserWaste[];

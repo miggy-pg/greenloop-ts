@@ -1,3 +1,5 @@
+import userTableColumn from "../../../constants/userTableColumn";
+
 type RowTypeKeys = "checkbox" | "actionButton" | "status" | "default" | "name";
 
 interface RowType {
@@ -21,7 +23,7 @@ interface Column {
 
 interface Header {
   data: string[];
-  render: () => JSX.Element;
+  render: (header: typeof userTableColumn, index: string) => JSX.Element;
 }
 
 interface Body {

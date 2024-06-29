@@ -11,11 +11,15 @@ export const getUsers = async () => {
   return response.data;
 };
 
-export const updateUser = async (userId: string, user: UserProps) =>
+export const updateUser = async (
+  userId: string | undefined,
+  user: UserProps
+): Promise<void> => {
   await http.put<void>(`/users/${userId}`, user);
+};
 
 export const createUser = async (user: UserProps) =>
   await http.post<void>("/sign-up", user);
 
-export const deleteUser = async (userId: string) =>
+export const deleteUser = async (userId: string | undefined) =>
   await http.delete<void>(`/users/${userId}`);

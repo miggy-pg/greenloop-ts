@@ -1,10 +1,16 @@
 import { useState } from "react";
 
+interface ImagePreview {
+  [id: string]: { name: number };
+}
+
 export const useUploadImage = () => {
-  const [image, setImage] = useState<string | ArrayBuffer | null | string[]>(
+  const [image, setImage] = useState<string | string[] | null | ArrayBuffer>(
     null
   );
-  const [imagePreview, setImagePreview] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<
+    File | null | string | ImagePreview | undefined
+  >(null);
 
   const fetchImage = (e: React.FormEvent<HTMLInputElement>) => {
     const target = e.target as HTMLInputElement;

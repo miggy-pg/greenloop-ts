@@ -5,17 +5,13 @@ import StyledButton from "../../Common/Button/StyledButton";
 import defaultImage from "../../../assets/images/default-image.jpg";
 import { UserProps } from "../../../types/user.type";
 
-interface CompanyList {
+interface UserList {
   company: UserProps;
-  handleGetUser: (companyId: string | undefined) => void;
+  handleGetUser: (userId: string | undefined) => void;
   handleDeleteUser: (commpanyId: string | undefined) => void;
 }
 
-function CompanyList({
-  company,
-  handleGetUser,
-  handleDeleteUser,
-}: CompanyList) {
+function UserList({ company, handleGetUser, handleDeleteUser }: UserList) {
   const navigate = useNavigate();
   const {
     image,
@@ -25,7 +21,7 @@ function CompanyList({
     province,
     username,
     city,
-    id: companyId,
+    id: userId,
   } = company;
 
   return (
@@ -52,7 +48,7 @@ function CompanyList({
         <StyledButton
           $variations="primaryBlue"
           $size="small"
-          onClick={() => handleGetUser(companyId)}
+          onClick={() => handleGetUser(userId)}
         >
           Update
         </StyledButton>
@@ -61,7 +57,7 @@ function CompanyList({
         <StyledButton
           $variations="danger"
           $size="small"
-          onClick={() => handleDeleteUser(companyId)}
+          onClick={() => handleDeleteUser(userId)}
         >
           Delete
         </StyledButton>
@@ -70,7 +66,7 @@ function CompanyList({
         <StyledButton
           $variations="secondary"
           $size="small"
-          onClick={() => navigate(`/profile/${companyId}`)}
+          onClick={() => navigate(`/profile/${userId}`)}
         >
           Details
         </StyledButton>
@@ -79,4 +75,4 @@ function CompanyList({
   );
 }
 
-export default CompanyList;
+export default UserList;

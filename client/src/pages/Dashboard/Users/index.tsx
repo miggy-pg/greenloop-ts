@@ -1,10 +1,10 @@
 import { useMemo, useState } from "react";
 import { Form } from "react-router-dom";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useForm } from "react-hook-form";
+import { SubmitHandler, useForm } from "react-hook-form";
 
 import Table from "../../../components/Common/Table";
-import CompanyList from "../../../components/Management/CompanyList";
+import UserList from "../../../components/Management/UserList";
 import { createUser, deleteUser, updateUser } from "../../../api/user";
 import { useUploadImage } from "../../../hooks/useUploadImage";
 import { useGetUsers } from "../../../hooks/useUser";
@@ -16,11 +16,20 @@ import { UserProps } from "../../../types/user.type";
 
 import defaultImage from "../../assets/images/default-image.jpg";
 
+interface User extends UserProps {
+  formData: UserProps;
+  image: string;
+}
+
+interface Error {
+  response: { data: string };
+}
+
 export default function Users() {
   document.title = "Green Loop | Dashboard";
   const queryClient = useQueryClient();
 
-  const [user, setUser] = useState<UserProps | null>(null);
+  const [user, setUser] = useState<UserProps | undefined>(undefined);
   const [showModal, setShowModal] = useState(false);
   const [places, setPlaces] = useState<string[] | undefined>([]);
 
@@ -31,8 +40,7 @@ export default function Users() {
 
   const { register, handleSubmit, reset } = useForm({
     defaultValues: {
-      isAdmin: user?.isAdmin,
-      cityMunicipality: user?.city,
+      ...user,
     },
   });
 
@@ -53,7 +61,7 @@ export default function Users() {
     }
   };
 
-  const getCompanyData = (userId: string) => {
+  const handleGetUser = (userId: string | undefined) => {
     const companyInfo = users.filter((user: UserProps) => user.id == userId);
     setUser(companyInfo[0]);
     const filteredMunicipalities = provinceAndMunicipality.filter((province) =>
@@ -70,48 +78,48 @@ export default function Users() {
       queryClient.invalidateQueries({ queryKey: ["companies"] });
       reset();
       setShowModal(false);
-      setUser({});
-      setImagePreview("");
+      setUser(undefined);
+      setImagePreview(null);
       setImage("");
     },
   });
 
-  const { mutate: handleUpdateCompany } = useMutation({
-    mutationFn: (data) => updateUser(data.companyId, data.formData),
+  const { mutate: handleUpdateUser } = useMutation({
+    mutationFn: (data: User) => updateUser(data?.id, data.formData),
     onSuccess: () => {
       alert("Company updated successfully");
       queryClient.invalidateQueries({ queryKey: ["companies"] });
       reset();
-      setUser({});
-      setImagePreview("");
+      setUser(undefined);
+      setImagePreview(null);
       setImage([]);
       setShowModal(false);
     },
-    onError: (error) => {
+    onError: (error: Error) => {
       alert(error.response?.data);
       console.log("error: ", error);
     },
   });
 
-  const { mutate: handleDeleteCompany } = useMutation({
-    mutationFn: (companyId) => deleteUser(companyId),
+  const { mutate: handleDeleteUser } = useMutation({
+    mutationFn: (userId: string | undefined) => deleteUser(userId),
     onSuccess: () => {
       alert("Company has been deleted");
       queryClient.invalidateQueries({ queryKey: ["companies"] });
     },
   });
 
-  const onSubmit = (data) => {
+  const onSubmit: SubmitHandler<User> = (data) => {
     const formData = { ...data, image };
     user?.id
-      ? handleUpdateCompany({ companyId: user.id, formData: formData })
+      ? handleUpdateUser({ id: user.id, formData })
       : handleCreateCompany({ ...formData, onAdminCreated: true });
   };
 
   const onClose = () => {
     setShowModal(false);
-    setUser({});
-    setImagePreview("");
+    setUser(undefined);
+    setImagePreview(null);
     setImage("");
   };
 
@@ -141,12 +149,12 @@ export default function Users() {
               )}
             />
             <Table.Body>
-              {users?.map((company, i) => (
-                <CompanyList
-                  key={i}
+              {users?.map((company, index) => (
+                <UserList
+                  key={index}
                   company={company}
-                  getCompanyData={getCompanyData}
-                  handleDeleteCompany={handleDeleteCompany}
+                  handleGetUser={handleGetUser}
+                  handleDeleteUser={handleDeleteUser}
                 />
               ))}
             </Table.Body>
@@ -162,7 +170,7 @@ export default function Users() {
                     <div className="border-0 rounded-lg shadow-lg relative flex flex-col w-108 bg-white outline-none focus:outline-none xsm:h-3/4 xsm:w-80">
                       <div className="flex items-center justify-center p-4 border-solid mx-auto border-blueGray-200 rounded-t md:p-2">
                         <h3 className="text-2xl font-semibold md:text-clamp">
-                          {user.id ? "Edit Company" : "Create Company"}
+                          {user?.id ? "Edit Company" : "Create Company"}
                         </h3>
                       </div>
                       <hr />
@@ -200,9 +208,7 @@ export default function Users() {
                               className="absolute cursor-pointer"
                             >
                               <p className="text-slate-400 text-clamp-xs">
-                                {image.length
-                                  ? "Replace"
-                                  : "Update Profile Picture"}
+                                {image ? "Replace" : "Update Profile Picture"}
                               </p>
                             </label>
                           </div>
@@ -226,10 +232,9 @@ export default function Users() {
                               <td className="px-6 py-2">
                                 <input
                                   type="text"
-                                  name="companyName"
-                                  id="companyName"
+                                  id="fullName"
                                   className=" w-4/5 rounded-md text-[#5b5c61] border-none focus:ring-transparent focus:border-transparent focus:text-black md:w-24"
-                                  {...register("companyName")}
+                                  {...register("fullName")}
                                 />
                               </td>
                             </tr>
@@ -243,7 +248,6 @@ export default function Users() {
                               <td className="px-6 py-2">
                                 <input
                                   type="text"
-                                  name="username"
                                   id="username"
                                   className="w-4/5 rounded-md text-[#5b5c61] border-none focus:ring-transparent focus:border-transparent focus:text-black md:w-24"
                                   {...register("username")}
@@ -260,7 +264,6 @@ export default function Users() {
                               <td className="px-6 py-2">
                                 <input
                                   type="password"
-                                  name="password"
                                   id="password"
                                   className="w-4/5 rounded-md text-[#5b5c61] border-none focus:ring-transparent focus:border-transparent focus:text-black md:w-24"
                                   {...register("password")}
@@ -277,7 +280,6 @@ export default function Users() {
                               <td className="px-6 py-2">
                                 <input
                                   type="email"
-                                  name="email"
                                   id="email"
                                   className="w-4/5 rounded-md text-[#5b5c61] border-none focus:ring-transparent focus:border-transparent focus:text-black md:w-24"
                                   {...register("email")}
@@ -294,15 +296,14 @@ export default function Users() {
                               <td className="px-6 py-2">
                                 <select
                                   id="organization-type"
-                                  name="organizations"
                                   className="bg-gray-50 border w-44 border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-1.5"
-                                  {...register("organizations", {
+                                  {...register("organization", {
                                     required: "Please select organization type",
                                   })}
                                 >
                                   {organizations?.map((item, index) => (
                                     <option
-                                      id={index}
+                                      id={String(index)}
                                       key={item.value}
                                       value={item.value}
                                     >
@@ -328,7 +329,7 @@ export default function Users() {
                                     required: "Please select a province",
                                   })}
                                 >
-                                  {proviceAndMunicipality.map(
+                                  {provinceAndMunicipality.map(
                                     (province, index) => (
                                       <option
                                         key={index}
@@ -352,7 +353,7 @@ export default function Users() {
                                 <select
                                   id="cityMunicipality"
                                   className="bg-gray-50 border border-gray-300 w-44 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-1.5"
-                                  {...register("cityMunicipality", {
+                                  {...register("city", {
                                     required:
                                       "Please select a city or municipality",
                                   })}
