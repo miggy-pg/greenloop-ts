@@ -11,10 +11,11 @@ export type UserProps = {
   confirmPassword?: string;
   id?: string;
   _id?: string;
-  image?: string | string[] | null | ArrayBuffer;
+  image?: string | string[] | undefined | ArrayBuffer;
   isAdmin?: boolean;
   token?: string;
   wastes?: UserWaste[];
+  onAdminCreated: boolean;
 };
 
 export interface User {

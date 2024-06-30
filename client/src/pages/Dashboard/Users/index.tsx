@@ -18,7 +18,6 @@ import defaultImage from "../../assets/images/default-image.jpg";
 
 interface User extends UserProps {
   formData: UserProps;
-  image: string;
 }
 
 interface Error {
@@ -38,7 +37,7 @@ export default function Users() {
   const { image, fetchImage, imagePreview, setImage, setImagePreview } =
     useUploadImage();
 
-  const { register, handleSubmit, reset } = useForm({
+  const { register, handleSubmit, reset } = useForm<User>({
     defaultValues: {
       ...user,
     },
@@ -110,9 +109,13 @@ export default function Users() {
   });
 
   const onSubmit: SubmitHandler<User> = (data) => {
-    const formData = { ...data, image };
+    const formData = {
+      ...data,
+      image,
+      fullName: "test",
+    };
     user?.id
-      ? handleUpdateUser({ id: user.id, formData })
+      ? handleUpdateUser({ id: user.id, ...formData })
       : handleCreateCompany({ ...formData, onAdminCreated: true });
   };
 
@@ -182,9 +185,9 @@ export default function Users() {
                               src={
                                 imagePreview
                                   ? URL.createObjectURL(imagePreview)
-                                  : null
+                                  : undefined
                               }
-                              alt={imagePreview ? imagePreview.name : null}
+                              alt={imagePreview ? imagePreview.name : undefined}
                               className="relative w-24 h-24 bg-white rounded-full flex justify-center items-center sm:w-28 sm:h-28 xsm:h-16 xsm:w-16"
                             />
                           ) : (
@@ -231,8 +234,8 @@ export default function Users() {
                               </th>
                               <td className="px-6 py-2">
                                 <input
-                                  type="text"
                                   id="fullName"
+                                  type="text"
                                   className=" w-4/5 rounded-md text-[#5b5c61] border-none focus:ring-transparent focus:border-transparent focus:text-black md:w-24"
                                   {...register("fullName")}
                                 />
