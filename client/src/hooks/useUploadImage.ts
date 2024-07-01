@@ -1,9 +1,10 @@
 import { useState } from "react";
 
 function useUploadImage() {
-  const [image, setImage] = useState<
-    string | string[] | undefined | ArrayBuffer
-  >(undefined);
+  // const [image, setImage] = useState<string | undefined | ArrayBuffer>(
+  //   undefined
+  // );
+  const [image, setImage] = useState<string | null | ArrayBuffer>(null);
   const [imagePreview, setImagePreview] = useState<File | null>(null);
 
   const fetchImage = (e: React.FormEvent<HTMLInputElement>) => {
@@ -15,7 +16,7 @@ function useUploadImage() {
     const reader = new FileReader();
     reader.readAsDataURL(file);
     reader.onloadend = () => {
-      setImage(reader.result);
+      setImage(reader?.result);
     };
   };
   return { image, fetchImage, imagePreview, setImage, setImagePreview };

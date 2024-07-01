@@ -1,5 +1,5 @@
 import http from "../services/httpService";
-import { UserProps, Users, User } from "../types/user.type";
+import { UserProps } from "../types/user.type";
 
 export const getUser = async (userId: string) => {
   const response = await http.get<UserProps[]>(`/users/${userId}`);

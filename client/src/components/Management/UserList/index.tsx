@@ -24,11 +24,13 @@ function UserList({ company, handleGetUser, handleDeleteUser }: UserList) {
     id: userId,
   } = company;
 
+  const userImage = image as string;
+
   return (
     <tr className="hover:bg-gray-100">
       <Table.Row type="default">
         <img
-          src={image ? image : defaultImage}
+          src={userImage ? userImage : defaultImage}
           className="rounded-full w-10 h-10"
         />
       </Table.Row>

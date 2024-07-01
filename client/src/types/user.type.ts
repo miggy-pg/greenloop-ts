@@ -1,6 +1,11 @@
 import { UserWaste } from "./waste.type";
 
-export type UserProps = {
+interface Image<T = string | string[] | undefined | ArrayBuffer> {
+  image: T;
+}
+
+// UserProps interface with a generic type for the image property
+export type UserProps<T = Image["image"]> = {
   fullName: string;
   username: string;
   email: string;
@@ -11,14 +16,12 @@ export type UserProps = {
   confirmPassword?: string;
   id?: string;
   _id?: string;
-  // image?: string | undefined;
-  image?: string | string[] | undefined | ArrayBuffer;
+  image?: T;
   isAdmin?: boolean;
   token?: string;
   wastes?: UserWaste[];
   onAdminCreated: boolean;
 };
-
 export interface User {
   data?: UserProps[];
   isLoading: boolean;

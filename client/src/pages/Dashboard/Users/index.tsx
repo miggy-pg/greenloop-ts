@@ -5,8 +5,8 @@ import { SubmitHandler, useForm } from "react-hook-form";
 
 import Table from "../../../components/Common/Table";
 import UserList from "../../../components/Management/UserList";
+import useUploadImage from "../../../hooks/useUploadImage";
 import { createUser, deleteUser, updateUser } from "../../../api/user";
-import { useUploadImage } from "../../../hooks/useUploadImage";
 import { useGetUsers } from "../../../hooks/useUser";
 
 import provinceAndMunicipality from "../../../constants/provinceAndMunicipality";
@@ -16,7 +16,11 @@ import { UserProps } from "../../../types/user.type";
 
 import defaultImage from "../../assets/images/default-image.jpg";
 
-interface User extends UserProps {
+interface Image<T = string | null | ArrayBuffer | string[]> {
+  image: T;
+}
+
+interface User extends UserProps<Image["image"]> {
   formData: UserProps;
 }
 
@@ -38,9 +42,7 @@ export default function Users() {
     useUploadImage();
 
   const { register, handleSubmit, reset } = useForm<User>({
-    defaultValues: {
-      ...user,
-    },
+    defaultValues: user,
   });
 
   const handleOnChangeProvince = (event: React.FormEvent<HTMLInputElement>) => {
@@ -91,7 +93,7 @@ export default function Users() {
       reset();
       setUser(undefined);
       setImagePreview(null);
-      setImage([]);
+      setImage(null);
       setShowModal(false);
     },
     onError: (error: Error) => {
@@ -112,7 +114,6 @@ export default function Users() {
     const formData = {
       ...data,
       image,
-      fullName: "test",
     };
     user?.id
       ? handleUpdateUser({ id: user.id, ...formData })
