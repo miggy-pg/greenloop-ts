@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export const useUploadImage = () => {
+function useUploadImage() {
   const [image, setImage] = useState<
     string | string[] | undefined | ArrayBuffer
   >(undefined);
@@ -19,4 +19,6 @@ export const useUploadImage = () => {
     };
   };
   return { image, fetchImage, imagePreview, setImage, setImagePreview };
-};
+}
+
+export default useUploadImage;

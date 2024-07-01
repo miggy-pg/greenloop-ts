@@ -11,6 +11,7 @@ export type UserProps = {
   confirmPassword?: string;
   id?: string;
   _id?: string;
+  // image?: string | undefined;
   image?: string | string[] | undefined | ArrayBuffer;
   isAdmin?: boolean;
   token?: string;
