@@ -1,6 +1,6 @@
 import { UserWaste } from "./waste.type";
 
-interface Image<T = string | string[] | undefined | ArrayBuffer> {
+interface Image<T = string | string[] | undefined | null | ArrayBuffer> {
   image: T;
 }
 
