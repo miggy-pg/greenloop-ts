@@ -7,6 +7,10 @@ import { Form } from "react-router-dom";
 import InputRow from "../../InputRow";
 import { UserProps } from "../../../../types/user.type";
 import organizations from "../../../../constants/organizations";
+import provinceAndMunicipality from "../../../../constants/provinceAndMunicipality";
+
+const selectClass =
+  "bg-gray-50 border w-44 border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-1.5";
 
 interface CreateUser {
   handleSubmit: UseFormHandleSubmit<UserProps>;
@@ -79,90 +83,75 @@ function CreateUser({ handleSubmit, register, image }: CreateUser) {
                       label="Name"
                       inputId="fullName"
                       type="text"
-                      inputRef={register("fullName")}
+                      {...register("fullName")}
                     />
                     <InputRow
                       label="Username"
                       inputId="username"
                       type="text"
-                      inputRef={register("username")}
+                      {...register("username")}
                     />
                     <InputRow
                       label="Password"
                       inputId="password"
                       type="text"
-                      inputRef={register("password")}
+                      {...register("password")}
                     />
                     <InputRow
                       label="Email"
                       inputId="email"
                       type="email"
-                      inputRef={register("email")}
+                      {...register("email")}
                     />
                     <InputRow
                       label="Organization"
-                      inputRef={register("organization")}
-                    />
-                    <tr className="bg-white">
-                      <th
-                        scope="row"
-                        className="px-6 py-2 font-medium text-gray-900 whitespace-nowrap"
-                      >
-                        Province:
-                      </th>
-                      <td className="px-6 py-2">
-                        <select
-                          id="province"
-                          className="bg-gray-50 border w-44 border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-1.5"
-                          {...register("province", {
-                            onChange: (e) => handleOnChangeProvince(e),
-                            required: "Please select a province",
-                          })}
-                        >
-                          {provinceAndMunicipality.map((province, index) => (
-                            <option key={index} value={province?.name}>
-                              {province.name}
-                            </option>
-                          ))}
-                        </select>
-                      </td>
-                    </tr>
-                    <tr className="bg-white">
-                      <th
-                        scope="row"
-                        className="px-6 py-2 font-medium text-gray-900 whitespace-nowrap"
-                      >
-                        City/Municipality:
-                      </th>
-                      <td className="px-6 py-2">
-                        <select
-                          id="cityMunicipality"
-                          className="bg-gray-50 border border-gray-300 w-44 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-1.5"
-                          {...register("city", {
-                            required: "Please select a city or municipality",
-                          })}
-                        >
-                          {places?.map((place, index) => (
-                            <option key={index} value={place}>
-                              {place}
-                            </option>
-                          ))}
-                        </select>
-                      </td>
-                    </tr>
-                    <tr className="bg-white">
-                      <th
-                        scope="row"
-                        className="px-6 py-2 font-medium text-gray-900 whitespace-nowrap"
-                      >
-                        Is Admin?
-                      </th>
-                      <td className="px-6 py-2">
-                        <label className="inline-flex items-center cursor-pointer">
-                          <input type="checkbox" {...register("isAdmin")} />
-                        </label>
-                      </td>
-                    </tr>
+                      {...register("organization", {
+                        required: "Please select organization type",
+                      })}
+                    >
+                      <select className={selectClass}>
+                        {organizations?.map((item, index) => (
+                          <option key={index} value={item.value}>
+                            {item.label}
+                          </option>
+                        ))}
+                      </select>
+                    </InputRow>
+                    <InputRow
+                      label="Province"
+                      {...register("province", {
+                        // onChange: (e) => handleOnChangeProvince(e),
+                        required: "Please select a province",
+                      })}
+                    >
+                      <select className={selectClass}>
+                        {provinceAndMunicipality.map((province, index) => (
+                          <option key={index} value={province?.name}>
+                            {province.name}
+                          </option>
+                        ))}
+                      </select>
+                    </InputRow>
+                    <InputRow
+                      label="City/Municipality"
+                      {...register("city", {
+                        // onChange: (e) => handleOnChangeProvince(e),
+                        required: "Please select a city or municipality",
+                      })}
+                    >
+                      <select className={selectClass}>
+                        {places?.map((place, index) => (
+                          <option key={index} value={place}>
+                            {place}
+                          </option>
+                        ))}
+                      </select>
+                    </InputRow>
+                    <InputRow label="Is Admin">
+                      <label className="inline-flex items-center cursor-pointer">
+                        <input type="checkbox" {...register("isAdmin")} />
+                      </label>
+                    </InputRow>
                   </tbody>
                 </table>
               </div>
