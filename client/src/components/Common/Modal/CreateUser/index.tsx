@@ -1,12 +1,20 @@
-import React from "react";
-import { UseFormHandleSubmit } from "react-hook-form";
+import {
+  FieldValues,
+  UseFormHandleSubmit,
+  UseFormRegister,
+} from "react-hook-form";
 import { Form } from "react-router-dom";
+import InputRow from "../../InputRow";
+import { UserProps } from "../../../../types/user.type";
+import organizations from "../../../../constants/organizations";
 
 interface CreateUser {
-  handleSubmit: UseFormHandleSubmit<>;
+  handleSubmit: UseFormHandleSubmit<UserProps>;
+  register: UseFormRegister<FieldValues>;
+  image: string[];
 }
 
-function CreateUser({ handleSubmit, inputRef, image }) {
+function CreateUser({ handleSubmit, register, image }: CreateUser) {
   return (
     <>
       <div className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none">
@@ -67,97 +75,34 @@ function CreateUser({ handleSubmit, inputRef, image }) {
               <div className="relative overflow-hidden py-5">
                 <table className="w-full mx-6 text-clamp-xs text-left  rtl:text-right text-gray-500 sm:mx-2">
                   <tbody>
-                    <tr className="bg-white">
-                      <th
-                        scope="row"
-                        className="px-6 py-2 font-medium text-gray-900 whitespace-nowrap"
-                      >
-                        Name:
-                      </th>
-                      <td className="px-6 py-2">
-                        <input
-                          id="fullName"
-                          type="text"
-                          className=" w-4/5 rounded-md text-[#5b5c61] border-none focus:ring-transparent focus:border-transparent focus:text-black md:w-24"
-                          {...register("fullName")}
-                        />
-                      </td>
-                    </tr>
-                    <tr className="bg-white">
-                      <th
-                        scope="row"
-                        className="px-6 py-2 font-medium text-gray-900 whitespace-nowrap"
-                      >
-                        Username:
-                      </th>
-                      <td className="px-6 py-2">
-                        <input
-                          type="text"
-                          id="username"
-                          className="w-4/5 rounded-md text-[#5b5c61] border-none focus:ring-transparent focus:border-transparent focus:text-black md:w-24"
-                          {...register("username")}
-                        />
-                      </td>
-                    </tr>
-                    <tr className="bg-white ">
-                      <th
-                        scope="row"
-                        className="px-6 py-2 font-medium text-gray-900 whitespace-nowrap"
-                      >
-                        Password:
-                      </th>
-                      <td className="px-6 py-2">
-                        <input
-                          type="password"
-                          id="password"
-                          className="w-4/5 rounded-md text-[#5b5c61] border-none focus:ring-transparent focus:border-transparent focus:text-black md:w-24"
-                          {...register("password")}
-                        />
-                      </td>
-                    </tr>
-                    <tr className="bg-white ">
-                      <th
-                        scope="row"
-                        className="px-6 py-2 font-medium text-gray-900 whitespace-nowrap"
-                      >
-                        Email:
-                      </th>
-                      <td className="px-6 py-2">
-                        <input
-                          type="email"
-                          id="email"
-                          className="w-4/5 rounded-md text-[#5b5c61] border-none focus:ring-transparent focus:border-transparent focus:text-black md:w-24"
-                          {...register("email")}
-                        />
-                      </td>
-                    </tr>
-                    <tr className="bg-white ">
-                      <th
-                        scope="row"
-                        className="px-6 py-2 font-medium text-gray-900 whitespace-nowrap"
-                      >
-                        Org Type:
-                      </th>
-                      <td className="px-6 py-2">
-                        <select
-                          id="organization-type"
-                          className="bg-gray-50 border w-44 border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-1.5"
-                          {...register("organization", {
-                            required: "Please select organization type",
-                          })}
-                        >
-                          {organizations?.map((item, index) => (
-                            <option
-                              id={String(index)}
-                              key={item.value}
-                              value={item.value}
-                            >
-                              {item.label}
-                            </option>
-                          ))}
-                        </select>
-                      </td>
-                    </tr>
+                    <InputRow
+                      label="Name"
+                      inputId="fullName"
+                      type="text"
+                      inputRef={register("fullName")}
+                    />
+                    <InputRow
+                      label="Username"
+                      inputId="username"
+                      type="text"
+                      inputRef={register("username")}
+                    />
+                    <InputRow
+                      label="Password"
+                      inputId="password"
+                      type="text"
+                      inputRef={register("password")}
+                    />
+                    <InputRow
+                      label="Email"
+                      inputId="email"
+                      type="email"
+                      inputRef={register("email")}
+                    />
+                    <InputRow
+                      label="Organization"
+                      inputRef={register("organization")}
+                    />
                     <tr className="bg-white">
                       <th
                         scope="row"

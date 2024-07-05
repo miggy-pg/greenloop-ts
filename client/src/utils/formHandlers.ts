@@ -1,4 +1,17 @@
-const handleOnChangeProvince = (event: React.FormEvent<HTMLInputElement>) => {
+import { SetStateAction } from "react";
+
+interface Province {
+  name: string;
+  places: string[];
+}
+
+interface ProvinceAndMunicipality extends Array<Province> {}
+
+const handleOnChangeProvince = (
+  event: React.FormEvent<HTMLInputElement>,
+  provinceAndMunicipality: ProvinceAndMunicipality,
+  setPlaces: React.Dispatch<SetStateAction<string[]>>
+) => {
   const inputEl = event.target as HTMLInputElement;
   if (inputEl.id == "provinces" && inputEl.value == "Select a Province") {
     setPlaces([]);

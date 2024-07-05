@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
+import { Form, useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 
 import Button from "../../../components/Common/Button/PrimaryButton";
@@ -88,7 +88,7 @@ function Register() {
             Sign Up
           </div>
 
-          <form
+          <Form
             className="flex flex-col justify-start items-left px-12 w-full md:px-0"
             onSubmit={handleSubmit(onSubmit)}
           >
@@ -175,7 +175,7 @@ function Register() {
                 className="bg-[#31572C] rounded-3xl mt-5"
               />
             </div>
-          </form>
+          </Form>
           <div className="mx-auto text-center">
             <span className="text-[#6C6C6C] font-light text-xs">
               Already have an account?{" "}
