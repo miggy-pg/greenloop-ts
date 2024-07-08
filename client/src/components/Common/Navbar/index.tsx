@@ -15,7 +15,7 @@ import {
 
 import Notification from "../../../pages/Notification/Desktop";
 import SettingsDropdown from "../../Common/SettingsDropdown";
-import Logout from "../Modal/Logout";
+import Logout from "../../Logout";
 import { useSocketMessage } from "../../../hooks/useSocket";
 
 import greenloopLogo from "../../../assets/images/greenloop-logo.png";

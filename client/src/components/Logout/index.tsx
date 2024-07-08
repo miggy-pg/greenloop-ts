@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { logout } from "../../../../api/auth";
+import { logout } from "../../api/auth";
 
 function Logout({
   setIsLoggingOut,

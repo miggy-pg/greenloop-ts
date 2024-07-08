@@ -5,11 +5,11 @@ import {
 } from "react-hook-form";
 import { Form } from "react-router-dom";
 
-import InputRow from "../../InputRow";
-import organizations from "../../../../constants/organizations";
-import provinceAndMunicipality from "../../../../constants/provinceAndMunicipality";
+import InputRow from "../../../../Common/InputRow";
+import organizations from "../../../../../constants/organizations";
+import provinceAndMunicipality from "../../../../../constants/provinceAndMunicipality";
 import defaultImage from "../../../../assets/default-image.webp";
-import { UserProps } from "../../../../types/user.type";
+import { UserProps } from "../../../../../types/user.type";
 
 const selectClass =
   "bg-gray-50 border w-44 border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-1.5";
