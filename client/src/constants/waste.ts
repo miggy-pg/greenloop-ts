@@ -1,3 +1,11 @@
+const wasteTableColumn: string[] = [
+  "Image",
+  "Description",
+  "Category",
+  "Actions",
+  "",
+];
+
 const wasteCategories: string[] = [
   "Plastic",
   "Plastic Bottle",
@@ -9,4 +17,4 @@ const wasteCategories: string[] = [
   "Biodegradable Waste",
 ];
 
-export default wasteCategories;
+export { wasteTableColumn, wasteCategories };

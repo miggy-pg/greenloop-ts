@@ -5,10 +5,10 @@ import { IoAddSharp } from "react-icons/io5";
 
 import PrimaryButton from "../../components/Common/Button/PrimaryButton";
 import Error from "../../components/Common/Message/Error";
-import wasteCategories from "../../constants/wasteCategories";
+import { wasteCategories } from "../../constants/waste";
 
 import { createWaste } from "../../api/waste";
-import { useUploadImage } from "../../hooks/useUploadImage";
+import useUploadImage from "../../hooks/useUploadImage";
 import { WasteProps } from "../../types/waste.type";
 
 // TODO: Improve error message in controllers to avoid using more properties
@@ -56,7 +56,7 @@ function Post() {
       queryClient.invalidateQueries({ queryKey: ["companyWastes"] });
       reset();
       setImagePreview(null);
-      setImage([]);
+      setImage(null);
       const wasteLength = Number(localStorage.getItem("wasteLength"));
       localStorage.setItem("wasteLength", String(wasteLength + 1));
     },

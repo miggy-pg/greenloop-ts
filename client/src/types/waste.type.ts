@@ -4,7 +4,7 @@ export type WasteProps = {
   description: string;
   category: string;
   image: string | ArrayBuffer | null | string[];
-  user: string;
+  user: UserProps;
   available?: boolean;
 };
 
@@ -21,15 +21,12 @@ export interface UserWaste {
   post: string;
   category: string;
 }
-export interface WasteCardProps {
+export interface WasteCardProps<T> {
   available: boolean;
   createdAt: Date;
   user: UserProps;
   id: string;
-  post: string;
+  description: string;
   category: string;
-  image: {
-    public_id: string;
-    url: string;
-  };
+  image: T;
 }

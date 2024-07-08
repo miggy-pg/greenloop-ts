@@ -1,17 +1,9 @@
 import Table from "../../Common/Table";
 import StyledButton from "../../Common/Button/StyledButton";
-import defaultImage from "../../../assets/images/waste-default-image.webp";
-
-interface Waste {
-  id: string;
-  description: string;
-  category: string;
-  user: string;
-  image: { url: string };
-}
+import { WasteCardProps } from "../../../types/waste.type";
 
 interface WasteList {
-  waste: Waste;
+  waste: WasteCardProps;
   handleGetWaste: (wasteId: string | undefined) => void;
   handleDeleteWaste: (wasteId: string | undefined) => void;
 }
@@ -27,7 +19,7 @@ export default function WasteList({
     <tr className="hover:bg-gray-100">
       <Table.Row type="default">
         <img
-          src={wasteImage?.url ? wasteImage.url : defaultImage}
+          src={wasteImage?.url ? wasteImage.url : undefined}
           className="w-10 h-10"
         />
       </Table.Row>

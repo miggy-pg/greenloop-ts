@@ -1,55 +1,68 @@
 import { useMemo, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useForm } from "react-hook-form";
+import { SubmitHandler, useForm } from "react-hook-form";
 
-import Table from "../../components/Common/Table";
-import WasteList from "../../components/Management/WasteList";
-import ErrorMessage from "../../components/Common/Message/ErrorMessage";
-import { useUploadImage } from "../../hooks/useUploadImage";
-import { useWastes } from "../../hooks/useWaste";
-import { deleteWaste, updateWaste } from "../../api/waste";
-import { wasteHeader } from "../../constants/wasteHeader";
+import Table from "../../../components/Common/Table";
+import WasteList from "../../../components/Management/WasteList";
+import ErrorMessage from "../../../components/Common/Message/Error";
+import useUploadImage from "../../../hooks/useUploadImage";
+import { useGetWastes } from "../../../hooks/useWaste";
+import { deleteWaste, updateWaste } from "../../../api/waste";
+import { wasteCategories, wasteTableColumn } from "../../../constants/waste";
+import { WasteCardProps, WasteProps } from "../../../types/waste.type";
 
-import wasteCategories from "../../constants/wasteCategories";
+interface Image<T = string | null | ArrayBuffer | string[]> {
+  image: T;
+}
+
+interface Waste extends WasteCardProps<Image> {
+  formData: WasteCardProps<Image>;
+}
+
+interface Error {
+  response: { data: string };
+}
 
 export default function Wastes() {
   document.title = "Green Loop | Dashboard";
   const queryClient = useQueryClient();
-  const [wasteData, setWasteData] = useState({});
+  const [wasteData, setWasteData] = useState<Waste | undefined>(undefined);
   const [showModal, setShowModal] = useState(false);
   const [errors, setErrors] = useState({});
 
-  const { wastes } = useWastes();
+  const { wastes } = useGetWastes();
   const { image, fetchImage, imagePreview, setImage, setImagePreview } =
     useUploadImage();
 
-  const { register, handleSubmit, reset } = useForm();
+  const { register, handleSubmit, reset } = useForm<WasteCardProps>();
 
-  const getWasteData = (wasteId) => {
+  const getWasteData = (wasteId: string) => {
     setShowModal(true);
-    const wasteRecord = wastes.filter((waste) => waste.id == wasteId);
+    const wasteRecord = wastes.filter(
+      (waste: WasteCardProps) => waste.id == wasteId
+    );
     console.log("wasteRecord: ", wasteRecord[0]);
-    setWasteData(wasteRecord[0]);
+    setWasteData(undefined);
   };
 
   const { mutate: handleUpdateWaste } = useMutation({
-    mutationFn: (waste) => updateWaste(waste.wasteId, waste.formData),
+    mutationFn: (waste: Waste) => updateWaste(waste.id, waste.formData),
     onSuccess: () => {
       alert("Waste updated successfully");
       queryClient.invalidateQueries({ queryKey: ["companyWastes"] });
       reset();
       setShowModal(false);
-      setWasteData({});
-      setImagePreview("");
+      setWasteData(undefined);
+      setImagePreview(null);
       setImage("");
     },
-    onError: (error) => {
-      setErrors(error?.response.data.errors);
+    onError: (error: Error) => {
+      setErrors(error?.response.data);
     },
   });
 
   const { mutate: deleteWasteAction } = useMutation({
-    mutationFn: (wasteId) => deleteWaste(wasteId),
+    mutationFn: (wasteId: string) => deleteWaste(wasteId),
     onSuccess: () => {
       alert("Waste has been deleted");
       queryClient.invalidateQueries({ queryKey: ["companyWastes"] });
@@ -59,15 +72,14 @@ export default function Wastes() {
     },
   });
 
-  const onSubmit = (data) => {
-    const formData = { ...data, image };
-    handleUpdateWaste({ wasteId: wasteData.id, formData: formData });
+  const onSubmit: SubmitHandler<Waste> = (data) => {
+    handleUpdateWaste({ id: wasteData.id, ...data, image });
   };
 
   const onClose = () => {
     setShowModal(false);
-    setWasteData({});
-    setImagePreview("");
+    setWasteData(undefined);
+    setImagePreview(null);
     setImage("");
   };
 
@@ -80,14 +92,14 @@ export default function Wastes() {
       <div className="overflow-x-scroll shadow rounded-lg">
         <Table>
           <Table.Header
-            data={wasteHeader}
+            data={wasteTableColumn}
             render={(header) => <Table.Column key={header} header={header} />}
           />
           <Table.Body>
             {wastes?.map((waste, i) => (
               <WasteList
                 key={i}
-                props={waste}
+                waste={waste}
                 getWasteData={getWasteData}
                 deleteWasteAction={deleteWasteAction}
               />

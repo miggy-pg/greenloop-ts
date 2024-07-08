@@ -11,7 +11,7 @@ import { useGetUsers } from "../../../hooks/useUser";
 
 import provinceAndMunicipality from "../../../constants/provinceAndMunicipality";
 import organizations from "../../../constants/organizations";
-import userTableColumn from "../../../constants/userTableColumn";
+import userTableColumn from "../../../constants/user";
 import { UserProps } from "../../../types/user.type";
 
 import defaultImage from "../../assets/images/default-image.jpg";

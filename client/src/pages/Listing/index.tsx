@@ -13,7 +13,7 @@ import Pagination from "../../components/Common/Pagination";
 import ListingCard from "../../components/Common/Cards/ListingCard";
 import SortByCard from "../../components/Common/Cards/SortByCard";
 import mindanaoPlaces from "../../constants/mindanaoPlaces";
-import wasteCategories from "../../constants/wasteCategories";
+import { wasteCategories } from "../../constants/waste";
 
 import { useWastes } from "../../hooks/useWaste";
 import { usePaginate } from "../../hooks/usePaginate";

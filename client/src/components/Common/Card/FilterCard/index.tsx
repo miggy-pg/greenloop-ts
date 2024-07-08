@@ -1,4 +1,4 @@
-import wasteCategories from "../../../../constants/wasteCategories";
+import { wasteCategories } from "../../../../constants/waste";
 
 function FilterCard({
   handleOnChangeFilter,
