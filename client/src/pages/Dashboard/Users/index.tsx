@@ -28,7 +28,7 @@ interface Error {
   response: { data: string };
 }
 
-export default function Users() {
+function Users() {
   document.title = "Green Loop | Dashboard";
   const queryClient = useQueryClient();
 
@@ -417,3 +417,5 @@ export default function Users() {
     </div>
   );
 }
+
+export default Users;

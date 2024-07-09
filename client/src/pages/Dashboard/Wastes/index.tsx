@@ -9,38 +9,41 @@ import useUploadImage from "../../../hooks/useUploadImage";
 import { useGetWastes } from "../../../hooks/useWaste";
 import { deleteWaste, updateWaste } from "../../../api/waste";
 import { wasteCategories, wasteTableColumn } from "../../../constants/waste";
-import { WasteCardProps, WasteProps } from "../../../types/waste.type";
+import { WasteCardProps } from "../../../types/waste.type";
 
 interface Image<T = string | null | ArrayBuffer | string[]> {
   image: T;
 }
 
-interface Waste extends WasteCardProps<Image> {
-  formData: WasteCardProps<Image>;
+interface Waste extends WasteCardProps<Image["image"]> {
+  formData: WasteCardProps<Image["image"]>;
 }
 
 interface Error {
-  response: { data: string };
+  response: ErrorState;
 }
 
-export default function Wastes() {
+interface ErrorState {
+  post: { message: string };
+  category: { message: string };
+}
+
+function Wastes() {
   document.title = "Green Loop | Dashboard";
   const queryClient = useQueryClient();
   const [wasteData, setWasteData] = useState<Waste | undefined>(undefined);
   const [showModal, setShowModal] = useState(false);
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState<ErrorState | undefined>(undefined);
 
   const { wastes } = useGetWastes();
   const { image, fetchImage, imagePreview, setImage, setImagePreview } =
     useUploadImage();
 
-  const { register, handleSubmit, reset } = useForm<WasteCardProps>();
+  const { register, handleSubmit, reset } = useForm<Waste>();
 
-  const getWasteData = (wasteId: string) => {
+  const handleGetWaste = (wasteId: string | undefined) => {
     setShowModal(true);
-    const wasteRecord = wastes.filter(
-      (waste: WasteCardProps) => waste.id == wasteId
-    );
+    const wasteRecord = wastes.filter((waste: Waste) => waste.id == wasteId);
     console.log("wasteRecord: ", wasteRecord[0]);
     setWasteData(undefined);
   };
@@ -57,11 +60,12 @@ export default function Wastes() {
       setImage("");
     },
     onError: (error: Error) => {
-      setErrors(error?.response.data);
+      setErrors(error?.response);
+      // setErrors(error?.response.data);
     },
   });
 
-  const { mutate: deleteWasteAction } = useMutation({
+  const { mutate: handleDeleteWaste } = useMutation({
     mutationFn: (wasteId: string) => deleteWaste(wasteId),
     onSuccess: () => {
       alert("Waste has been deleted");
@@ -73,7 +77,7 @@ export default function Wastes() {
   });
 
   const onSubmit: SubmitHandler<Waste> = (data) => {
-    handleUpdateWaste({ id: wasteData.id, ...data, image });
+    if (wasteData) handleUpdateWaste({ ...data, id: wasteData.id, image });
   };
 
   const onClose = () => {
@@ -100,8 +104,8 @@ export default function Wastes() {
               <WasteList
                 key={i}
                 waste={waste}
-                getWasteData={getWasteData}
-                deleteWasteAction={deleteWasteAction}
+                handleGetWaste={handleGetWaste}
+                handleDeleteWaste={handleDeleteWaste}
               />
             ))}
           </Table.Body>
@@ -131,23 +135,19 @@ export default function Wastes() {
                         )}
 
                         <textarea
-                          id="post"
-                          name="post"
-                          rows="4"
+                          rows={4}
                           className="text-gray-900 text-left w-full overflow-y-hidden mb-3 focus:outline-none focus: border-0"
                           placeholder="Say something about the waste"
-                          {...register("post")}
+                          {...register("description")}
                         />
                         <div className="grid">
-                          {errors?.wasteCategory && (
-                            <ErrorMessage
-                              error={errors?.wasteCategory.message}
-                            />
+                          {errors?.category && (
+                            <ErrorMessage error={errors?.category.message} />
                           )}
                           <select
                             id="wasteCategory"
                             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-2/5 p-2.5 md:w-[10rem]"
-                            {...register("wasteCategory")}
+                            {...register("category")}
                           >
                             <option value="">Select an option</option>
                             {wasteCategories.map((category) => (
@@ -165,9 +165,9 @@ export default function Wastes() {
                             src={
                               imagePreview
                                 ? URL.createObjectURL(imagePreview)
-                                : null
+                                : ""
                             }
-                            alt={wasteData?.post || null}
+                            alt={wasteData?.description || ""}
                             className="relative w-full h-48 border-2 bg-white rounded-lg flex justify-center items-center mb-5"
                           />
                           <label
@@ -188,7 +188,7 @@ export default function Wastes() {
                         <>
                           <div className="relative w-full h-48 border-dashed border-[#e9e4e4] border-2 bg-white rounded-lg flex justify-center items-center mb-5 md:h-[12rem] xsm:mb-0 xsm:h-[6rem]">
                             <img
-                              src={wasteData?.image?.url}
+                              // src={wasteData?.image?.url}
                               className="relative w-full h-48 border-2 rounded-lg flex justify-center items-center"
                             />
                           </div>
@@ -206,9 +206,9 @@ export default function Wastes() {
                             onChange={fetchImage}
                           />
 
-                          {errors["image.url"] && (
+                          {/* {errors["image.url"] && (
                             <ErrorMessage error={errors["image.url"].message} />
-                          )}
+                          )} */}
                         </>
                       )}
                       <div className="w-full text-right mt-10">
@@ -239,3 +239,5 @@ export default function Wastes() {
     </>
   );
 }
+
+export default Wastes;

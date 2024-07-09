@@ -1,11 +1,17 @@
 import Table from "../../Common/Table";
 import StyledButton from "../../Common/Button/StyledButton";
 import { WasteCardProps } from "../../../types/waste.type";
+import { UseMutateFunction } from "@tanstack/react-query";
+import { AxiosResponse } from "axios";
+interface Image<T = string | null | ArrayBuffer | string[]> {
+  image: T;
+}
 
 interface WasteList {
-  waste: WasteCardProps;
+  waste: WasteCardProps<{ url: string }>;
   handleGetWaste: (wasteId: string | undefined) => void;
-  handleDeleteWaste: (wasteId: string | undefined) => void;
+  handleDeleteWaste: UseMutateFunction<AxiosResponse, Error, string, unknown>;
+  // handleDeleteWaste: (wasteId: string | undefined) => void;
 }
 
 export default function WasteList({

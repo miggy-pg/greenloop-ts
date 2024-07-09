@@ -12,11 +12,14 @@ import Body from "../../components/Common/Body";
 import Pagination from "../../components/Common/Pagination";
 import ListingCard from "../../components/Common/Cards/ListingCard";
 import SortByCard from "../../components/Common/Cards/SortByCard";
-import mindanaoPlaces from "../../constants/mindanaoPlaces";
 import { wasteCategories } from "../../constants/waste";
 
-import { useWastes } from "../../hooks/useWaste";
+import { useGetWastes } from "../../hooks/useWaste";
 import { usePaginate } from "../../hooks/usePaginate";
+import provinceAndMunicipality, {
+  ProvinceAndMunicipalityOption,
+} from "../../constants/provinceAndMunicipality";
+import { WasteCardProps } from "../../types/waste.type";
 
 const filterWastes = (
   unfilteredWastes,
@@ -55,7 +58,7 @@ const filterWastes = (
       );
   } else if (provinceItem && cityMunicipalityItem && !categories) {
     return filteredWaste
-      .filter((waste) =>
+      .filter((waste: ProvinceAndMunicipalityOption) =>
         waste.user.province.toLowerCase().includes(provinceItem)
       )
       .filter((waste) =>
@@ -78,12 +81,17 @@ const filterWastes = (
   }
 };
 
-const Listing = ({ myWaste }) => {
+interface Image<T = string | ArrayBuffer | null> {
+  image: T;
+}
+
+const Listing = ({ myWaste }: { myWaste: WasteCardProps<Image["image"]> }) => {
   document.title = "Green Loop | Listing";
 
   const [searchParams, setSearchParams] = useSearchParams();
   const params = new URLSearchParams(searchParams);
-  const user = JSON.parse(localStorage.getItem("user:detail"));
+  const userStorage = localStorage.getItem("user:detail");
+  const user = userStorage ? JSON.parse(userStorage) : "";
 
   const [currentCategories, setCategoryQuery] = useState([]);
   const [open, setOpen] = useState(true);
@@ -91,12 +99,8 @@ const Listing = ({ myWaste }) => {
   const [places, setPlaces] = useState([]);
   const [filteredWaste, setFilteredWaste] = useState([]);
 
-  const wasteQuery = useWastes();
-  const {
-    wasteQuery: { data: wastes },
-    isLoading,
-    error,
-  } = useMemo(() => wasteQuery, [wasteQuery]);
+  const wasteQuery = useGetWastes();
+  const { wastes, isLoading, error } = useMemo(() => wasteQuery, [wasteQuery]);
   let filterQuery = searchParams.get("filter") || "";
   let provinceParams = searchParams.get("province") || "";
   let cityMunicipalityParams = searchParams.get("cityMunicipality") || "";
@@ -122,16 +126,19 @@ const Listing = ({ myWaste }) => {
     currentPosts,
   } = usePaginate(origWaste);
 
-  const handleOnChangeProvince = (e) => {
+  const handleOnChangeProvince = (
+    event: React.FormEvent<HTMLSelectElement>
+  ) => {
     searchParams.delete("category");
     setSearchParams(searchParams);
 
     setCategoryQuery([]);
 
-    let selectedProvince = e.target.value;
+    const inputEl = event.target as HTMLInputElement;
+    let selectedProvince = inputEl.value;
 
     if (
-      e.target.id == "provinces" &&
+      inputEl.id == "provinces" &&
       provinceParams &&
       selectedProvince == "Select a Province"
     ) {
@@ -141,8 +148,8 @@ const Listing = ({ myWaste }) => {
       setPlaces([]);
       setFilteredWaste({});
     } else {
-      const filteredMunicipalities = mindanaoPlaces.filter((province) =>
-        province.name.includes(selectedProvince)
+      const filteredMunicipalities = provinceAndMunicipality.filter(
+        (province) => province.name.includes(selectedProvince)
       )[0];
       const wastesProvince = displayedWaste.filter((waste) =>
         waste.user.province.includes(selectedProvince)
@@ -160,21 +167,24 @@ const Listing = ({ myWaste }) => {
       if (items.length > 3) {
         params.set("province", items.slice(0, 3).join());
         setSearchParams(searchParams);
-        document.getElementById("municipalities").value =
+        (document.getElementById("municipalities") as HTMLInputElement).value =
           filteredMunicipalities.places[0];
       } else {
         params.set("province", selectedProvince);
         setSearchParams(params);
-        document.getElementById("municipalities").value =
+        (document.getElementById("municipalities") as HTMLInputElement).value =
           filteredMunicipalities.places[0];
       }
     }
   };
 
-  const handleOnChangeCityMunicipality = (e) => {
-    let selectedCityMunicipality = e.target.value;
+  const handleOnChangeCityMunicipality = (
+    event: React.FormEvent<HTMLSelectElement>
+  ) => {
+    const inputEl = event.target as HTMLInputElement;
+    let selectedCityMunicipality = inputEl.value;
 
-    if (!e.target.value.includes("Select a City/Municipality")) {
+    if (!inputEl.value.includes("Select a City/Municipality")) {
       // Get the current category from the URL
       categoryParams && params.set("category", categoryParams);
 
@@ -192,11 +202,12 @@ const Listing = ({ myWaste }) => {
       setFilteredWaste(wasteMunicipality);
     }
   };
-  const handleOnChangeCategory = (e) => {
-    if (e.target.checked) {
-      var categories = [...currentCategories, e.target.value];
+  const handleOnChangeCategory = (event: React.FormEvent<HTMLInputElement>) => {
+    const inputEl = event.target as HTMLInputElement;
+    if (inputEl.checked) {
+      var categories = [...currentCategories, inputEl.value];
 
-      setCategoryQuery((prev) => [...prev, e.target.value]);
+      setCategoryQuery((prev) => [...prev, inputEl.value]);
       searchParams.set("category", categories.join(","));
 
       if (provinceParams && cityMunicipalityParams && categories) {
@@ -240,11 +251,11 @@ const Listing = ({ myWaste }) => {
       setSearchParams(searchParams);
     } else {
       setCategoryQuery((prev) =>
-        prev.filter((category) => category !== e.target.value)
+        prev.filter((category) => category !== inputEl.value)
       );
 
       const categoryItems = categoryParams.split(",");
-      const popCategory = categoryItems.indexOf(e.target.value);
+      const popCategory = categoryItems.indexOf(inputEl.value);
       categoryItems.splice(popCategory, 1);
       if (categoryItems.length == 0) {
         if (provinceParams && cityMunicipalityParams) {
@@ -312,8 +323,9 @@ const Listing = ({ myWaste }) => {
     }
   };
 
-  const handleSortBy = (e) => {
-    if (e.target.textContent == "Latest to Oldest") {
+  const handleSortBy = (event: React.FormEvent<HTMLInputElement>) => {
+    const inputEl = event.target as HTMLInputElement;
+    if (inputEl.textContent == "Latest to Oldest") {
       origWaste?.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
     } else {
       origWaste.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
@@ -322,9 +334,10 @@ const Listing = ({ myWaste }) => {
   };
 
   const handleClearFilter = () => {
-    document.getElementById("provinces").value = mindanaoPlaces[0].name;
+    (document.getElementById("provinces") as HTMLInputElement).value =
+      provinceAndMunicipality[0].name;
     wasteCategories.map((category) => {
-      document.getElementById(category).checked = false;
+      (document.getElementById(category) as HTMLInputElement).checked = false;
     });
 
     setPlaces([]);
@@ -433,21 +446,23 @@ const Listing = ({ myWaste }) => {
             </div>
             <div className="absolute -right-0 px-6">
               <label
-                htmlFor="provinces"
+                htmlFor="province"
                 className="block mb-2 text-clamp-xs font-medium text-gray-900 mt-5"
               >
                 Select a Province
               </label>
               <select
-                id="provinces"
+                id="province"
                 className="border border-gray-300 text-clamp-xs rounded-lg block w-full p-2.5 "
                 onChange={(e) => handleOnChangeProvince(e)}
               >
-                {mindanaoPlaces.map((province, index) => (
-                  <option key={index} value={province.name}>
-                    {province.name}
-                  </option>
-                ))}
+                {provinceAndMunicipality.map(
+                  (province: { name: string }, index: number) => (
+                    <option key={index} value={province.name}>
+                      {province.name}
+                    </option>
+                  )
+                )}
               </select>
               <label
                 htmlFor="municipalities"

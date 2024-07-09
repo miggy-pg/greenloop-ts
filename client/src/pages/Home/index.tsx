@@ -1,9 +1,9 @@
 import { useEffect, useMemo } from "react";
 
 import Body from "../../components/Common/Body";
-import NoWasteCard from "../../components/Common/Card/NoWasteCard";
-import GreetingCard from "../../components/Common/Card/GreetingCard";
-import WasteCard from "../../components/Common/Card/WasteCard";
+import NoWasteCard from "../../components/Common/Cards/NoWasteCard";
+import GreetingCard from "../../components/Common/Cards/GreetingCard";
+import WasteCard from "../../components/Common/Cards/WasteCard";
 import SKWasteCard from "../../components/Common/Skeleton/SKWasteCard";
 import SKNoWasteCard from "../../components/Common/Skeleton/SKNoWasteCard";
 import { useGetWastes } from "../../hooks/useWaste";
