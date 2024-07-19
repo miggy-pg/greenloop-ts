@@ -1,3 +1,4 @@
+import React from "react";
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 
@@ -16,16 +17,18 @@ import { wasteCategories } from "../../constants/waste";
 
 import { useGetWastes } from "../../hooks/useWaste";
 import { usePaginate } from "../../hooks/usePaginate";
-import provinceAndMunicipality, {
-  ProvinceAndMunicipalityOption,
-} from "../../constants/provinceAndMunicipality";
+import provinceAndMunicipality from "../../constants/provinceAndMunicipality";
 import { WasteCardProps } from "../../types/waste.type";
 
+interface Image<T = string | ArrayBuffer | null> {
+  image: T;
+}
+
 const filterWastes = (
-  unfilteredWastes,
-  province,
-  cityMunicipality,
-  categories
+  unfilteredWastes: WasteCardProps<Image["image"]>[],
+  province: string,
+  cityMunicipality: string,
+  categories: string[] | never
 ) => {
   let filteredWaste = unfilteredWastes;
   let provinceItem = province?.toLowerCase();
@@ -39,11 +42,11 @@ const filterWastes = (
         waste.user.province.toLowerCase().includes(provinceItem)
       )
       .filter((waste) =>
-        waste.user.cityMunicipality.toLowerCase().includes(cityMunicipalityItem)
+        waste.user.city.toLowerCase().includes(cityMunicipalityItem)
       )
       .filter((waste) =>
         categories.some((category) =>
-          waste.wasteCategory.toLowerCase().includes(category.toLowerCase())
+          waste.category.toLowerCase().includes(category.toLowerCase())
         )
       );
   } else if (provinceItem && !cityMunicipalityItem && categories) {
@@ -53,16 +56,16 @@ const filterWastes = (
       )
       .filter((waste) =>
         categories.some((category) =>
-          waste.wasteCategory.toLowerCase().includes(category.toLowerCase())
+          waste.category.toLowerCase().includes(category.toLowerCase())
         )
       );
   } else if (provinceItem && cityMunicipalityItem && !categories) {
     return filteredWaste
-      .filter((waste: ProvinceAndMunicipalityOption) =>
+      .filter((waste) =>
         waste.user.province.toLowerCase().includes(provinceItem)
       )
       .filter((waste) =>
-        waste.user.cityMunicipality.toLowerCase().includes(cityMunicipalityItem)
+        waste.user.city.toLowerCase().includes(cityMunicipalityItem)
       );
   } else if (provinceItem && !cityMunicipalityItem && !categories) {
     return filteredWaste.filter((waste) =>
@@ -71,21 +74,21 @@ const filterWastes = (
   } else if (!provinceItem && !cityMunicipalityItem && categories) {
     return filteredWaste.filter((waste) =>
       categories.some((category) =>
-        waste.wasteCategory.toLowerCase().includes(category.toLowerCase())
+        waste.category.toLowerCase().includes(category.toLowerCase())
       )
     );
   } else if (!provinceItem && cityMunicipalityItem && !categories) {
     return filteredWaste.filter((waste) =>
-      waste.user.cityMunicipality.toLowerCase().includes(cityMunicipalityItem)
+      waste.user.city.toLowerCase().includes(cityMunicipalityItem)
     );
   }
 };
 
-interface Image<T = string | ArrayBuffer | null> {
-  image: T;
-}
-
-const Listing = ({ myWaste }: { myWaste: WasteCardProps<Image["image"]> }) => {
+const Listing = ({
+  myWaste,
+}: {
+  myWaste: WasteCardProps<Image["image"]>[];
+}) => {
   document.title = "Green Loop | Listing";
 
   const [searchParams, setSearchParams] = useSearchParams();
@@ -96,17 +99,19 @@ const Listing = ({ myWaste }: { myWaste: WasteCardProps<Image["image"]> }) => {
   const [currentCategories, setCategoryQuery] = useState([]);
   const [open, setOpen] = useState(true);
   const [isSortBy, setIsSortBy] = useState(false);
-  const [places, setPlaces] = useState([]);
-  const [filteredWaste, setFilteredWaste] = useState([]);
+  const [places, setPlaces] = useState<string[] | []>([]);
+  const [filteredWaste, setFilteredWaste] = useState<
+    WasteCardProps<Image["image"]>[] | []
+  >([]);
 
   const wasteQuery = useGetWastes();
   const { wastes, isLoading, error } = useMemo(() => wasteQuery, [wasteQuery]);
   let filterQuery = searchParams.get("filter") || "";
   let provinceParams = searchParams.get("province") || "";
   let cityMunicipalityParams = searchParams.get("cityMunicipality") || "";
-  let categoryParams = searchParams.get("category") || "";
+  let categoryParams = searchParams.get("category") || [];
 
-  let wasteItems;
+  let wasteItems: WasteCardProps<Image["image"]>[];
   if (filterQuery) {
     wasteItems = wastes?.filter((waste) => waste.post.includes(filterQuery));
   } else {
@@ -146,7 +151,7 @@ const Listing = ({ myWaste }: { myWaste: WasteCardProps<Image["image"]> }) => {
       searchParams.delete("cityMunicipality");
       setSearchParams(searchParams);
       setPlaces([]);
-      setFilteredWaste({});
+      setFilteredWaste([]);
     } else {
       const filteredMunicipalities = provinceAndMunicipality.filter(
         (province) => province.name.includes(selectedProvince)
@@ -155,7 +160,12 @@ const Listing = ({ myWaste }: { myWaste: WasteCardProps<Image["image"]> }) => {
         waste.user.province.includes(selectedProvince)
       );
       wasteCategories.map((category) => {
-        document.getElementById(category).checked = false;
+        const categoryEl = document.getElementById(
+          category
+        ) as HTMLInputElement;
+        if (categoryEl) {
+          categoryEl.checked = false;
+        }
       });
 
       setFilteredWaste(wastesProvince);
@@ -202,7 +212,9 @@ const Listing = ({ myWaste }: { myWaste: WasteCardProps<Image["image"]> }) => {
       setFilteredWaste(wasteMunicipality);
     }
   };
-  const handleOnChangeCategory = (event: React.FormEvent<HTMLInputElement>) => {
+  const handleOnChangeCategory = (
+    event: React.MouseEvent<HTMLInputElement>
+  ) => {
     const inputEl = event.target as HTMLInputElement;
     if (inputEl.checked) {
       var categories = [...currentCategories, inputEl.value];
@@ -323,7 +335,9 @@ const Listing = ({ myWaste }: { myWaste: WasteCardProps<Image["image"]> }) => {
     }
   };
 
-  const handleSortBy = (event: React.FormEvent<HTMLInputElement>) => {
+  const handleSortBy = (
+    event: React.MouseEvent<HTMLDivElement, MouseEvent>
+  ) => {
     const inputEl = event.target as HTMLInputElement;
     if (inputEl.textContent == "Latest to Oldest") {
       origWaste?.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));

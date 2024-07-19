@@ -1,16 +1,12 @@
 import { useSearchParams } from "react-router-dom";
+import { WasteCardProps } from "../types/waste.type";
 
-interface Listing {
-  available: boolean;
-  createdAt: Date;
-  id: string;
-  image: { publicId: string; url: string };
-  post: string;
-  wasteCategory: string;
+interface Image<T = string | ArrayBuffer | null> {
+  image: T;
 }
 
 export const usePaginate = (
-  origWaste: Listing[],
+  origWaste: WasteCardProps<Image["image"]>[],
   POST_PER_PAGE: number = 6
 ) => {
   const [searchParams, setSearchParams] = useSearchParams();
