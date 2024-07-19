@@ -11,26 +11,17 @@ import { HiOutlineDotsHorizontal } from "react-icons/hi";
 import { UserProps } from "../../../../types/user.type";
 
 import defaultImage from "../../../../assets/images/waste-default-image.webp";
-import { Payload } from "../../../../types/waste.type";
+import { WasteAvailable, WasteCardProps } from "../../../../types/waste.type";
 
-interface ListingCardProps {
-  available: boolean;
-  createdAt: Date;
-  user: { _id: string };
-  id: string;
-  post: string;
-  wasteCategory: string;
-  image: {
-    public_id: string;
-    url: string;
-  };
+interface Image<T = { public_id: string; url: string }> {
+  image: T;
 }
 
 function ListingCard({
   waste,
   loggedInUser,
 }: {
-  waste: ListingCardProps;
+  waste: WasteCardProps<Image["image"]>;
   loggedInUser: UserProps;
 }) {
   const url = window.location.href;
@@ -39,20 +30,20 @@ function ListingCard({
   const {
     id: wasteId,
     image,
-    post,
+    description,
     user: { _id: userId },
-    wasteCategory,
+    category,
     createdAt,
     available,
   } = waste;
 
-  const transformedTexts = plasticColor(wasteCategory);
+  const transformedTexts = plasticColor(category);
   const queryClient = useQueryClient();
 
   const { handleSubmit } = useForm();
 
   const { mutate: handleUpdateWasteAvailability } = useMutation({
-    mutationFn: ({ wasteId, available }: Payload) => {
+    mutationFn: ({ wasteId, available }: WasteAvailable) => {
       return updateWasteAvailability(wasteId, {
         available: available,
       });
@@ -83,12 +74,14 @@ function ListingCard({
         </div>
       </Link>
       <article className="p-6">
-        <p className="text-gray-900 text-left  xsm:text-[0.7rem]">{post}</p>
+        <p className="text-gray-900 text-left  xsm:text-[0.7rem]">
+          {description}
+        </p>
         <div className="flex flex-wrap mt-3">
           <p
             className={`text-black text-left py-1 text-[0.7rem] rounded-full ${transformedTexts} m-1 p-3`}
           >
-            {wasteCategory || "undefined"}
+            {category || "undefined"}
           </p>
         </div>
 
@@ -152,12 +145,14 @@ function ListingCard({
         </div>
       </div>
       <article className="p-6">
-        <p className="text-gray-900 text-left  xsm:text-[0.7rem]">{post}</p>
+        <p className="text-gray-900 text-left  xsm:text-[0.7rem]">
+          {description}
+        </p>
         <div className="flex flex-wrap mt-3">
           <p
             className={`text-black text-left py-1 text-[0.7rem] rounded-full ${transformedTexts} m-1 p-3`}
           >
-            {wasteCategory || "undefined"}
+            {category || "undefined"}
           </p>
         </div>
       </article>

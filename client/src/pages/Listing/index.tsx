@@ -20,19 +20,19 @@ import { usePaginate } from "../../hooks/usePaginate";
 import provinceAndMunicipality from "../../constants/provinceAndMunicipality";
 import { WasteCardProps } from "../../types/waste.type";
 
-interface Image<T = string | ArrayBuffer | null> {
+interface Image<T = { public_id: string; url: string }> {
   image: T;
 }
 
 const filterWastes = (
   unfilteredWastes: WasteCardProps<Image["image"]>[],
   province: string,
-  cityMunicipality: string,
+  city: string,
   categories: string[] | never
 ) => {
   let filteredWaste = unfilteredWastes;
   let provinceItem = province?.toLowerCase();
-  let cityMunicipalityItem = cityMunicipality?.toLowerCase();
+  let cityMunicipalityItem = city?.toLowerCase();
 
   if (!provinceItem && !cityMunicipalityItem && !categories) return [];
 
@@ -91,25 +91,27 @@ const Listing = ({
 }) => {
   document.title = "Green Loop | Listing";
 
-  const [searchParams, setSearchParams] = useSearchParams();
-  const params = new URLSearchParams(searchParams);
   const userStorage = localStorage.getItem("user:detail");
   const user = userStorage ? JSON.parse(userStorage) : "";
+  const [searchParams, setSearchParams] = useSearchParams();
+  const params = new URLSearchParams(searchParams);
 
-  const [currentCategories, setCategoryQuery] = useState([]);
+  const [currentCategories, setCategoryQuery] = useState<string[]>([]);
   const [open, setOpen] = useState(true);
   const [isSortBy, setIsSortBy] = useState(false);
   const [places, setPlaces] = useState<string[] | []>([]);
   const [filteredWaste, setFilteredWaste] = useState<
-    WasteCardProps<Image["image"]>[] | []
+    WasteCardProps<Image["image"]>[] | [] | undefined
   >([]);
 
   const wasteQuery = useGetWastes();
   const { wastes, isLoading, error } = useMemo(() => wasteQuery, [wasteQuery]);
   let filterQuery = searchParams.get("filter") || "";
   let provinceParams = searchParams.get("province") || "";
-  let cityMunicipalityParams = searchParams.get("cityMunicipality") || "";
-  let categoryParams = searchParams.get("category") || [];
+  let cityMunicipalityParams = searchParams.get("city") || "";
+  let categoryParams = [searchParams.get("category")].filter(
+    (param): param is string => param !== null
+  );
 
   let wasteItems: WasteCardProps<Image["image"]>[];
   if (filterQuery) {
@@ -148,7 +150,7 @@ const Listing = ({
       selectedProvince == "Select a Province"
     ) {
       searchParams.delete("province");
-      searchParams.delete("cityMunicipality");
+      searchParams.delete("city");
       setSearchParams(searchParams);
       setPlaces([]);
       setFilteredWaste([]);
@@ -196,24 +198,25 @@ const Listing = ({
 
     if (!inputEl.value.includes("Select a City/Municipality")) {
       // Get the current category from the URL
-      categoryParams && params.set("category", categoryParams);
+      categoryParams && params.set("category", categoryParams.join(","));
 
       params.set("province", provinceParams);
-      params.set("cityMunicipality", selectedCityMunicipality);
+      params.set("city", selectedCityMunicipality);
 
       setSearchParams(params);
-      const wasteMunicipality = filterWastes(
-        displayedWaste,
-        provinceParams,
-        selectedCityMunicipality,
-        categoryParams
-      );
+      const wasteMunicipality: WasteCardProps<Image["image"]>[] | undefined =
+        filterWastes(
+          displayedWaste,
+          provinceParams,
+          selectedCityMunicipality,
+          categoryParams
+        );
 
       setFilteredWaste(wasteMunicipality);
     }
   };
   const handleOnChangeCategory = (
-    event: React.MouseEvent<HTMLInputElement>
+    event: React.ChangeEvent<HTMLInputElement>
   ) => {
     const inputEl = event.target as HTMLInputElement;
     if (inputEl.checked) {
@@ -225,26 +228,22 @@ const Listing = ({
       if (provinceParams && cityMunicipalityParams && categories) {
         const wastesCategory = displayedWaste
           .filter((waste) => waste.user.province.includes(provinceParams))
+          .filter((waste) => waste.user.city.includes(cityMunicipalityParams))
           .filter((waste) =>
-            waste.user.cityMunicipality.includes(cityMunicipalityParams)
-          )
-          .filter((waste) =>
-            categories.some((category) => waste.wasteCategory == category)
+            categories.some((category) => waste.category == category)
           );
         setFilteredWaste(wastesCategory);
       } else if (provinceParams && !cityMunicipalityParams && categories) {
         const wastesCategory = displayedWaste
           .filter((waste) => waste.user.province.includes(provinceParams))
           .filter((waste) =>
-            categories.some((category) => waste.wasteCategory == category)
+            categories.some((category) => waste.category == category)
           );
         setFilteredWaste(wastesCategory);
       } else if (provinceParams && cityMunicipalityParams && !categories) {
         const wastesCategory = displayedWaste
           .filter((waste) => waste.user.province.includes(provinceParams))
-          .filter((waste) =>
-            waste.user.cityMunicipality.includes(cityMunicipalityParams)
-          );
+          .filter((waste) => waste.user.city.includes(cityMunicipalityParams));
         setFilteredWaste(wastesCategory);
       } else if (provinceParams && !cityMunicipalityParams && !categories) {
         const wastesProvince = displayedWaste.filter((waste) =>
@@ -253,20 +252,20 @@ const Listing = ({
         setFilteredWaste(wastesProvince);
       } else {
         const wastesCategory = displayedWaste.filter((waste) =>
-          categories.some((category) => waste.wasteCategory == category)
+          categories.some((category) => waste.category == category)
         );
         setFilteredWaste(wastesCategory);
       }
 
       searchParams.get("province");
-      searchParams.get("cityMunicipality");
+      searchParams.get("city");
       setSearchParams(searchParams);
     } else {
       setCategoryQuery((prev) =>
         prev.filter((category) => category !== inputEl.value)
       );
 
-      const categoryItems = categoryParams.split(",");
+      const categoryItems = categoryParams;
       const popCategory = categoryItems.indexOf(inputEl.value);
       categoryItems.splice(popCategory, 1);
       if (categoryItems.length == 0) {
@@ -275,7 +274,7 @@ const Listing = ({
           const wastesCategory = displayedWaste
             .filter((waste) => waste.user.province.includes(provinceParams))
             .filter((waste) =>
-              waste.user.cityMunicipality.includes(cityMunicipalityParams)
+              waste.user.city.includes(cityMunicipalityParams)
             );
 
           setFilteredWaste(wastesCategory);
@@ -294,11 +293,9 @@ const Listing = ({
           console.log("Else Category: - 1");
           const wastesCategory = displayedWaste
             .filter((waste) => waste.user.province.includes(provinceParams))
+            .filter((waste) => waste.user.city.includes(cityMunicipalityParams))
             .filter((waste) =>
-              waste.user.cityMunicipality.includes(cityMunicipalityParams)
-            )
-            .filter((waste) =>
-              categoryItems.some((category) => waste.wasteCategory == category)
+              categoryItems.some((category) => waste.category == category)
             );
           setFilteredWaste(wastesCategory);
         } else if (provinceParams && !cityMunicipalityParams && categoryItems) {
@@ -306,7 +303,7 @@ const Listing = ({
           const wastesCategory = displayedWaste
             .filter((waste) => waste.user.province.includes(provinceParams))
             .filter((waste) =>
-              categoryItems.some((category) => waste.wasteCategory == category)
+              categoryItems.some((category) => waste.category == category)
             );
           setFilteredWaste(wastesCategory);
         } else if (
@@ -321,14 +318,14 @@ const Listing = ({
           setFilteredWaste(wastesCategory);
         } else {
           const wastesCategory = displayedWaste.filter((waste) =>
-            categoryItems.some((category) => waste.wasteCategory == category)
+            categoryItems.some((category) => waste.category == category)
           );
           setFilteredWaste(wastesCategory);
         }
 
         searchParams.set("category", categoryItems.join(","));
         searchParams.get("province");
-        searchParams.get("cityMunicipality");
+        searchParams.get("city");
 
         setSearchParams(searchParams);
       }
@@ -340,9 +337,15 @@ const Listing = ({
   ) => {
     const inputEl = event.target as HTMLInputElement;
     if (inputEl.textContent == "Latest to Oldest") {
-      origWaste?.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+      origWaste?.sort(
+        (a, b) =>
+          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+      );
     } else {
-      origWaste.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      origWaste?.sort(
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
     }
     setIsSortBy(false);
   };
@@ -359,7 +362,7 @@ const Listing = ({
 
     searchParams.delete("category");
     searchParams.delete("province");
-    searchParams.delete("cityMunicipality");
+    searchParams.delete("city");
 
     setSearchParams(searchParams);
   };
@@ -367,7 +370,7 @@ const Listing = ({
   useEffect(() => {
     searchParams.delete("category");
     searchParams.delete("province");
-    searchParams.delete("cityMunicipality");
+    searchParams.delete("city");
     setSearchParams(searchParams);
   }, []);
 
@@ -378,7 +381,7 @@ const Listing = ({
       bodyClass={`${
         myWaste
           ? "bg-[#F3F4F6] py-0 mt-0"
-          : !currentPosts?.length
+          : currentPosts && !currentPosts?.length
           ? "bg-[#F8F8F8]"
           : "bg-white py-6 mt-0"
       }`}
@@ -436,7 +439,7 @@ const Listing = ({
         {!myWaste && (
           <div
             className={`z-10  ${open ? "w-80" : "w-0"} ${
-              currentPosts?.length ? "bg-white" : "bg-[#F8F8F8]"
+              currentPosts && currentPosts?.length ? "bg-white" : "bg-[#F8F8F8]"
             } pt-8 relative duration-300`}
           >
             <TbArrowBarLeft
@@ -528,10 +531,10 @@ const Listing = ({
 
         <div
           className={`w-full mt-7 grid gap-10 px-32 ${
-            currentPosts?.length ? "grid-cols-3" : "h-108"
+            currentPosts && currentPosts?.length ? "grid-cols-3" : "h-108"
           } lg:grid-cols-2 lg:px-16 lg:gap-10 md:mt-4 md:gap-2 md:grid-cols-1 md:px-24 sm:px-16 xsm:px-4`}
         >
-          {currentPosts?.length ? (
+          {currentPosts && currentPosts?.length ? (
             currentPosts?.map((waste, index) => (
               <ListingCard key={index} waste={waste} loggedInUser={user} />
             ))
@@ -545,7 +548,7 @@ const Listing = ({
         </div>
       </div>
 
-      {origWaste?.length > 2 && (
+      {origWaste && origWaste?.length > 2 && (
         <div className="flex justify-center px-6 mb-4 mt-10 lg:mb-16 sm:px-0 sm:pb-0 ">
           <Pagination
             origWaste={origWaste}
