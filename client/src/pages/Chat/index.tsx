@@ -1,31 +1,39 @@
-import { io } from "socket.io-client";
-
+import * as io from "socket.io-client";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useWindowSize } from "@uidotdev/usehooks";
-
 import { TbSend, TbCirclePlus, TbArrowLeft } from "react-icons/tb";
 
 import Input from "../../components/Common/Input";
-import { getConversations, getMessages } from "../../api/conversation";
-import { sendUserMessage } from "../../api/message";
+import { getConversation } from "../../api/conversation";
+import { getMessage, sendMessage } from "../../api/message";
+import { envRoute } from "../../utils/route";
+import { socketPort } from "../../utils/socket";
 
 import defaultImage from "../../assets/images/default-image.jpg";
-import { getEndpoint, socketPort } from "../../utils/Helper";
+import { UserProps } from "../../types/user.type";
+import { Message } from "../../types/message.type";
+
+interface SocketMessages {
+  receiver: Pick<UserProps, "id">;
+  messages: Message[];
+  conversationId: string;
+}
 
 const Chat = () => {
   document.title = "Green Loop | Chat";
 
-  const loggedInUser = JSON.parse(localStorage.getItem("user:detail") || "{}");
+  const userStorage = localStorage.get("user:detail");
+  const user = userStorage ? JSON.parse(userStorage) : "";
+
   const [searchParams, setSearchParams] = useSearchParams();
   const [receiverUser, setReceiverUser] = useState({});
 
   const [file, setFile] = useState([]);
   const [conversations, setConversations] = useState([]);
-  const [messages, setMessages] = useState({});
+  const [messages, setMessages] = useState<SocketMessages[]>([]);
   const [message, setMessage] = useState("");
-  const [users, setUsers] = useState([]);
-  const [socket, setSocket] = useState(null);
+  const [socket, setSocket] = useState<io.Socket | null>(null);
   const [openConvo, setOpenConvo] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [isTablet, setIsTable] = useState(false);
@@ -33,17 +41,18 @@ const Chat = () => {
   const messageRef = useRef(null);
   const { width } = useWindowSize();
 
-  const user = JSON.parse(localStorage.getItem("user:detail"));
-  console.log("userChat: ", user);
   const conversationId = searchParams.get("id");
 
   useEffect(() => {
-    setSocket(io.connect(socketPort));
+    const port = io.connect(socketPort);
+    setSocket(port);
   }, []);
 
   useMemo(() => {
-    socket?.emit("addCompany", user?.id);
-    socket?.on("getCompanies", (users) => {
+    socket?.emit("addUser", user?.id);
+    // socket?.emit("addCompany", user?.id);
+    // socket?.on("getCompanies", (users) => {
+    socket?.on("getUsers", (users) => {
       console.log("activeUsers: ", users);
     });
     socket?.on("getMessage", (data) => {
@@ -65,24 +74,10 @@ const Chat = () => {
 
   useMemo(() => {
     const fetchConversations = async () => {
-      const { data } = await getConversations(loggedInUser?.id);
+      const { data } = await getConversation(user?.id);
       setConversations(data);
     };
     fetchConversations();
-  }, []);
-
-  useMemo(() => {
-    const fetchUsers = async () => {
-      const res = await fetch(`${getEndpoint}:8000/v1/users`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      const resData = await res.json();
-      setUsers(resData);
-    };
-    fetchUsers();
   }, []);
 
   useMemo(() => {
@@ -91,7 +86,7 @@ const Chat = () => {
         const receiver = conversations?.find(
           (convo) => convo?.conversation.conversationId === conversationId
         );
-        const { data } = await getMessages(
+        const { data } = await getMessage(
           conversationId,
           user?.id,
           receiver?.conversation.sender.senderId
@@ -122,7 +117,7 @@ const Chat = () => {
     searchParams.set("id", conversationId);
     setSearchParams(searchParams);
 
-    const { data } = await getMessages(conversationId, user?.id, receiver);
+    const { data } = await getMessage(conversationId, user?.id, receiver);
 
     setOpenConvo(true);
     setMessages({ messages: data, receiver, conversationId });

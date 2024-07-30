@@ -17,19 +17,16 @@ interface Conversation {
 }
 
 interface Messages {
-  // user: { image: Image };
-  // message: Conversation;
-  // conversationId: string;
+  user: { image: Image };
+  message: Conversation;
+  conversationId: string;
   id: string;
-  message: string;
-  image: { url: string };
+  msg: string;
+  msgImage: { url: string };
 }
 
-interface UserMessage
-  extends Pick<UserProps, "fullName" | "image" | "id" | "email"> {}
-
 export interface Message {
-  user: UserMessage;
+  user: UserProps;
   conversationId: string;
   hasRead: boolean;
   // id: string;
