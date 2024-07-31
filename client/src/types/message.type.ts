@@ -3,20 +3,23 @@ import { UserProps } from "./user.type";
 export type MessageProps = {
   conversationId: string;
   senderId: string;
-  message: string;
   receiverId: string;
+  message: string;
   image?: string;
 };
 
-interface Image {
-  url: string;
-}
+// socketmessage
+// {
+//     "senderId": "6619fee4a725d3c1ff21a859",
+//     "message": "heyyy",
+//     "conversationId": "665c73f196de408ea6935f15",
+//     "company": {
+//         "id": "6619fee4a725d3c1ff21a859",
+//         "email": "lguquezon@gmail.com"
+//     }
+// }
 
-interface Conversation {
-  id: string;
-}
-
-interface Messages {
+interface Message {
   // user: { image: Image };
   // message: Conversation;
   // conversationId: string;
@@ -28,12 +31,10 @@ interface Messages {
 interface UserMessage
   extends Pick<UserProps, "fullName" | "image" | "id" | "email"> {}
 
-export interface Message {
-  user: UserMessage;
+export interface ResponseMessage {
   conversationId: string;
+  user: UserMessage;
   hasRead: boolean;
-  // id: string;
-  // _id?: string;
-  message: Messages;
-  // user: { fullName: string };
+  message: Message;
+  _id?: string;
 }

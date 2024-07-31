@@ -7,17 +7,26 @@ import { TbSend, TbCirclePlus, TbArrowLeft } from "react-icons/tb";
 import Input from "../../components/Common/Input";
 import { getConversation } from "../../api/conversation";
 import { getMessage, sendMessage } from "../../api/message";
-import { envRoute } from "../../utils/route";
 import { socketPort } from "../../utils/socket";
 
 import defaultImage from "../../assets/images/default-image.jpg";
 import { UserProps } from "../../types/user.type";
-import { Message } from "../../types/message.type";
+import { ResponseMessage } from "../../types/message.type";
 
-interface SocketMessages {
+interface SocketMessage {
   receiver: Pick<UserProps, "id">;
-  messages: Message[];
+  messages: (ResponseMessage | { message: ResponseMessage[] })[];
   conversationId: string;
+}
+
+interface Conversation {
+  conversationId: string;
+  user: Pick<UserProps, "id" | "fullName" | "image">;
+  messages: ResponseMessage[];
+}
+
+interface ConversationRes {
+  conversation: Conversation;
 }
 
 const Chat = () => {
@@ -30,15 +39,17 @@ const Chat = () => {
   const [receiverUser, setReceiverUser] = useState({});
 
   const [file, setFile] = useState([]);
-  const [conversations, setConversations] = useState([]);
-  const [messages, setMessages] = useState<SocketMessages[]>([]);
-  const [message, setMessage] = useState("");
+  const [conversations, setConversations] = useState<ConversationRes[] | []>(
+    []
+  );
+  const [messages, setMessages] = useState<SocketMessage>();
+  const [message, setMessage] = useState<string | "">("");
   const [socket, setSocket] = useState<io.Socket | null>(null);
-  const [openConvo, setOpenConvo] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
-  const [isTablet, setIsTable] = useState(false);
+  const [openConvo, setOpenConvo] = useState<boolean>(false);
+  const [isMobile, setIsMobile] = useState<boolean>(false);
+  const [isTablet, setIsTable] = useState<boolean>(false);
 
-  const messageRef = useRef(null);
+  const messageRef = useRef<null | HTMLDivElement>(null);
   const { width } = useWindowSize();
 
   const conversationId = searchParams.get("id");
@@ -46,36 +57,52 @@ const Chat = () => {
   useEffect(() => {
     const port = io.connect(socketPort);
     setSocket(port);
+    return () => {
+      port.disconnect();
+    };
   }, []);
 
-  useMemo(() => {
-    socket?.emit("addUser", user?.id);
-    // socket?.emit("addCompany", user?.id);
-    // socket?.on("getCompanies", (users) => {
-    socket?.on("getUsers", (users) => {
-      console.log("activeUsers: ", users);
-    });
-    socket?.on("getMessage", (data) => {
-      setMessages((prev) => ({
-        ...prev,
-        messages: [
-          ...prev.messages,
-          { user: data.user, message: data.message },
-        ],
-      }));
-    });
+  useEffect(() => {
+    if (socket) {
+      socket.emit("addUser", user?.id);
+      socket.on("getMessage", (data) => {
+        setMessages((prev) =>
+          prev
+            ? {
+                ...prev,
+                messages: [
+                  ...prev.messages,
+                  {
+                    message: data.message,
+                  },
+                ],
+              }
+            : prev
+        );
+      });
+
+      return () => {
+        socket.off("getMessage");
+      };
+    }
   }, [socket]);
 
   useEffect(() => {
     messageRef?.current?.scrollIntoView({ behavior: "smooth" });
-    width < 512 ? setIsMobile(true) : setIsMobile(false);
-    width > 512 && width < 768 ? setIsTable(true) : setIsTable(false);
+    if (width) {
+      width < 512 ? setIsMobile(true) : setIsMobile(false);
+      width > 512 && width < 768 ? setIsTable(true) : setIsTable(false);
+    }
   }, [messages?.messages, width]);
 
   useMemo(() => {
     const fetchConversations = async () => {
-      const { data } = await getConversation(user?.id);
-      setConversations(data);
+      try {
+        const { data } = await getConversation(user?.id);
+        setConversations(data);
+      } catch (err) {
+        console.log("Failed fetching conversations. ", err);
+      }
     };
     fetchConversations();
   }, []);
@@ -83,20 +110,26 @@ const Chat = () => {
   useMemo(() => {
     const getConversation = async () => {
       if (conversationId) {
-        const receiver = conversations?.find(
+        const conversation = conversations?.find(
           (convo) => convo?.conversation.conversationId === conversationId
         );
-        const { data } = await getMessage(
-          conversationId,
-          user?.id,
-          receiver?.conversation.sender.senderId
-        );
-        setReceiverUser(receiver?.conversation.sender);
-        setMessages({
-          messages: data,
-          receiver: receiver?.conversation.sender.senderId,
-          conversationId,
-        });
+        if (conversation) {
+          try {
+            const { data } = await getMessage(
+              conversationId,
+              user?.id,
+              conversation.user.id
+            );
+            setReceiverUser(receiver?.conversation.sender);
+            setMessages({
+              messages: data,
+              receiver: receiver?.conversation.sender.senderId,
+              conversationId,
+            });
+          } catch (err) {
+            console.log("Failed fetching conversation. ", err);
+          }
+        }
       } else {
         setMessages({});
       }
@@ -123,7 +156,7 @@ const Chat = () => {
     setMessages({ messages: data, receiver, conversationId });
   };
 
-  const sendMessage = async () => {
+  const handleSendMessage = async (e) => {
     setMessage("");
     socket?.emit("sendMessage", {
       senderId: user?.id,
@@ -140,7 +173,7 @@ const Chat = () => {
     };
     file.length > 0 && (messageForm.image = file);
 
-    await sendUserMessage(messageForm);
+    await sendMessage(messageForm);
     setFile([]);
   };
 
@@ -592,7 +625,7 @@ const Chat = () => {
                     className={`ml-2 p-2 cursor-pointer bg-light rounded-full ${
                       !message && "pointer-events-none"
                     }`}
-                    onClick={(e) => sendMessage(e)}
+                    onClick={(e) => handleSendMessage(e)}
                   >
                     <TbSend className="h-6 w-6" />
                   </div>

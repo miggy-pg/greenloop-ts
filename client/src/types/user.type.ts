@@ -14,7 +14,8 @@ export type UserProps<T = Image["image"]> = {
   city: string;
   password: string;
   confirmPassword?: string;
-  id?: string;
+  id: string;
+  // id?: string;
   _id?: string;
   image?: T;
   isAdmin?: boolean;
@@ -22,6 +23,7 @@ export type UserProps<T = Image["image"]> = {
   wastes?: UserWaste[];
   onAdminCreated: boolean;
 };
+
 export interface User {
   data?: UserProps[];
   isLoading: boolean;
