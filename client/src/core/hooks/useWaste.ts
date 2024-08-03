@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { getWastes } from "../../api/waste";
+import { getWastes } from "../../core/api/waste";
 
 export const useGetWastes = () => {
   const {

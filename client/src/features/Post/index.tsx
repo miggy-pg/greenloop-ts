@@ -7,7 +7,7 @@ import PrimaryButton from "../../components/common/Button/PrimaryButton";
 import Error from "../../components/common/Error";
 import { wasteCategories } from "../../core/constants/waste";
 
-import { createWaste } from "../../api/waste";
+import { createWaste } from "../../core/api/waste";
 import useUploadImage from "../../core/hooks/useUploadImage";
 import { WasteProps } from "../../types/waste.type";
 
