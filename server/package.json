@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@types/bcryptjs": "^2.4.6",
+    "@types/omit": "^1.0.3",
     "bcryptjs": "^2.4.3",
     "cloudinary": "^2.4.0",
     "dayjs": "^1.11.12",
@@ -25,6 +26,7 @@
     "mongodb": "^6.8.0",
     "mongoose": "^8.5.2",
     "morgan": "^1.10.0",
+    "omit": "^1.0.1",
     "passport": "^0.7.0"
   }
 }

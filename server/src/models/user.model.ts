@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import dayjs from "dayjs";
 import bcrypt from "bcryptjs";
+import omit from "omit";
 
 interface UserDocument extends mongoose.Document {
   _id: mongoose.Schema.Types.ObjectId;
@@ -17,6 +18,10 @@ interface UserDocument extends mongoose.Document {
   isAdmin: boolean;
   expires?: Date;
   token: string;
+
+  comparePassword(password: string): boolean;
+  hashPassword(): Promise<string>;
+  hidePassword(): void;
 }
 
 const userSchema = new mongoose.Schema<UserDocument>({
@@ -116,6 +121,11 @@ userSchema.methods.hashPassword = function () {
   });
 };
 
+userSchema.methods.hidePassword = function () {
+  return omit(["password", "__v", "_id"], this.toObject({ virtuals: true }));
+};
+
 const User = mongoose.model<UserDocument>("User", userSchema);
 
 export default User;
+export { UserDocument };
