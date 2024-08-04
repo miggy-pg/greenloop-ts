@@ -40,6 +40,6 @@ const wasteSchema = new mongoose.Schema<WasteDocument>({
   },
 });
 
-const Waste = mongoose.model("Waste", wasteSchema);
+const Waste = mongoose.model<WasteDocument>("Waste", wasteSchema);
 
 export default Waste;

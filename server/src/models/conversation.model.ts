@@ -18,7 +18,10 @@ const conversationSchema = new mongoose.Schema<ConversationDocument>({
   },
 });
 
-const Conversation = mongoose.model("Conversation", conversationSchema);
+const Conversation = mongoose.model<ConversationDocument>(
+  "Conversation",
+  conversationSchema
+);
 
 export default Conversation;
 export { ConversationDocument };

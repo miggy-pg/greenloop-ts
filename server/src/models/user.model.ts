@@ -1,4 +1,6 @@
 import mongoose from "mongoose";
+import dayjs from "dayjs";
+import bcrypt from "bcryptjs";
 
 interface UserDocument extends mongoose.Document {
   _id: mongoose.Schema.Types.ObjectId;
@@ -6,11 +8,14 @@ interface UserDocument extends mongoose.Document {
   email: string;
   username: string;
   password: string;
+  passwordResetToken: string;
+  passwordResetExpires: Date;
   organization: string;
   city: string;
   province: string;
   image: { public: string; url: string };
   isAdmin: boolean;
+  expires?: Date;
   token: string;
 }
 
@@ -42,6 +47,14 @@ const userSchema = new mongoose.Schema<UserDocument>({
     minlength: 8,
     maxlength: 300,
   },
+  passwordResetToken: {
+    type: String,
+    default: "",
+  },
+  passwordResetExpires: {
+    type: Date,
+    default: dayjs().toDate(),
+  },
   organization: {
     type: String,
     maxlength: 50,
@@ -70,8 +83,39 @@ const userSchema = new mongoose.Schema<UserDocument>({
     minlength: 150,
     maxlength: 300,
   },
+  expires: {
+    type: Date,
+    default: dayjs().toDate(),
+    expires: 43200,
+  },
 });
 
-const User = mongoose.model("User", userSchema);
+userSchema.methods.comparePassword = function (password: string) {
+  return bcrypt.compare(password, this.password);
+};
+
+userSchema.methods.hashPassword = function () {
+  return new Promise((resolve, reject) => {
+    bcrypt.genSalt(10, (err1, salt) => {
+      if (err1) {
+        reject(err1);
+        return;
+      }
+      bcrypt.hash(this.password, salt, (err2, hashedPassword) => {
+        if (err2) {
+          reject(err2);
+          return;
+        }
+        // TODO: Check for differences between these two
+        this.password = hashedPassword;
+        // this.set("password", hashedPassword);
+        // this.save();
+        resolve(hashedPassword);
+      });
+    });
+  });
+};
+
+const User = mongoose.model<UserDocument>("User", userSchema);
 
 export default User;
