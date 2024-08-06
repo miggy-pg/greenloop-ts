@@ -16,6 +16,7 @@ interface UserDocument extends mongoose.Document {
   province: string;
   image: { public: string; url: string };
   isAdmin: boolean;
+  isVerified: boolean;
   expires?: Date;
   token: string;
 
@@ -81,6 +82,9 @@ const userSchema = new mongoose.Schema<UserDocument>({
     },
   },
   isAdmin: {
+    type: Boolean,
+  },
+  isVerified: {
     type: Boolean,
   },
   token: {
