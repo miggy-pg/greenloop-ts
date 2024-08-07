@@ -43,7 +43,3 @@ const postLogin = async (req: Request, res: Response, next: NextFunction) => {
 
   return;
 };
-
-const postLogout = async (req: Request, res: Response) => {
-  return;
-};
