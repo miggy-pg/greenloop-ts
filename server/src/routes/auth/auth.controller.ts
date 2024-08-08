@@ -36,10 +36,17 @@ const postLogin = async (req: Request, res: Response, next: NextFunction) => {
     if (!user.isVerified)
       return res.status(401).send({
         message:
-          "[ERROR] Your account has not been verified. Please activate your account.",
+          "[ERROR] Your account has not been verified. Please activate your account",
       });
     return;
   });
 
+  return;
+};
+
+const postLogout = async (req: Request, res: Response) => {
+  req.session.destroy((err: Error) => {
+    if (err) res.status(500).send({ message: "[ERROR] Logout failed", err });
+  });
   return;
 };
