@@ -48,5 +48,8 @@ const postLogout = async (req: Request, res: Response) => {
   req.session.destroy((err: Error) => {
     if (err) res.status(500).send({ message: "[ERROR] Logout failed", err });
   });
+  req.sessionId = "";
+  req.logout();
+  res.status(200).send({ message: "[SUCCESS] Logout success" });
   return;
 };
